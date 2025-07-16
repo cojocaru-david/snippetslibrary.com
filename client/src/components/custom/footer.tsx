@@ -104,7 +104,6 @@ export default function Footer({ border = false }: { border?: boolean }) {
                   </svg>
                 </a>
               </li>
-              <a href="https://startupfa.me/s/snippets-library?utm_source=snippetslibrary.com" target="_blank"><img src="https://startupfa.me/badges/featured-badge.webp" alt="Featured on Startup Fame" width="171" height="54" /></a>
             </ul>
           </div>
         </div>

@@ -4,7 +4,15 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Bun](https://img.shields.io/badge/Bun-000000?style=flat&logo=bun&logoColor=white)](https://bun.sh/)
-[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare%20Workers-F38020?style=flat&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
+
+<p align="center">
+  <img src=".github/images/1.png" alt="Snippets Library Preview 1" width="45%" />
+  <img src=".github/images/2.png" alt="Snippets Library Preview 2" width="45%" />
+</p>
+<p align="center">
+  <img src=".github/images/3.png" alt="Snippets Library Preview 3" width="45%" />
+  <img src=".github/images/4.png" alt="Snippets Library Preview 4" width="45%" />
+</p>
 
 A modern, full-stack code snippet manager built with cutting-edge technologies. Store, organize, and share your code snippets with beautiful syntax highlighting and a clean, intuitive interface.
 
@@ -286,6 +294,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Drizzle ORM](https://orm.drizzle.team/) for type-safe database queries
 - [Hono](https://hono.dev/) for the lightweight web framework
 - [Bun](https://bun.sh/) for the fast JavaScript runtime
+- [BHVR](https://bhvr.dev/) the base for the project
 
 ## 📞 Support
 

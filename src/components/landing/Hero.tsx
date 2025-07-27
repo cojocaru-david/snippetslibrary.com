@@ -26,9 +26,9 @@ export default function HeroHome({
       <PageIllustration />
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Hero content */}
-        <div className="pb-12 pt-32 md:pb-20 md:pt-40">
+        <div className="pb-12 pt-32 md:pb-20">
           {/* Section header */}
-          <div className="pb-12 text-center md:pb-16">
+          <div className="pb-12 text-center md:pb-16 flex flex-col items-center gap-4">
             <h1
               className="mb-6 border-y text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold [border-image:linear-gradient(to_right,transparent,var(--color-border),transparent)1] text-foreground leading-tight"
               data-aos="zoom-y-out"
@@ -82,6 +82,31 @@ export default function HeroHome({
                   </Button>
                 </div>
               </div>
+            </div>
+            <div
+              className="flex justify-center"
+              data-aos="zoom-y-out"
+              data-aos-delay={800}
+            >
+              <a
+                href="https://openhunts.com/projects/snippets-library"
+                target="_blank"
+                title="OpenHunts Top 1 Daily Winner"
+              >
+                <img
+                  src="https://openhunts.com/images/badges/top1-light.png"
+                  alt="OpenHunts Top 1 Daily Winner"
+                  style={{ width: "195px", height: "auto" }}
+                  className="block dark:hidden"
+                />
+
+                <img
+                  src="https://openhunts.com/images/badges/top1-dark.png"
+                  alt="OpenHunts Top 1 Daily Winner"
+                  style={{ width: "195px", height: "auto" }}
+                  className="hidden dark:block"
+                />
+              </a>
             </div>
           </div>
           {/* Hero image */}

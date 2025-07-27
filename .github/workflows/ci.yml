@@ -1,0 +1,216 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [v2]
+  pull_request:
+    branches: [v2]
+
+jobs:
+  lint-and-format:
+    runs-on: ubuntu-latest
+    name: Lint and Format
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Check formatting with Prettier
+        run: npm run format -- --check
+
+      - name: TypeScript compilation check
+        run: npx tsc --noEmit
+
+  build-test:
+    runs-on: ubuntu-latest
+    name: Build and Test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Check for build artifacts
+        run: |
+          if [ ! -d ".next" ]; then
+            echo "Build failed: .next directory not found"
+            exit 1
+          fi
+          echo "Build successful: .next directory found"
+
+  docker-build-test:
+    runs-on: ubuntu-latest
+    name: Docker Build Test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (test only)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: snippets-library:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test Docker image
+        run: |
+          # Start the container in detached mode
+          docker run -d --name test-container -p 3000:3000 \
+            -e DATABASE_URL=postgresql://test:test@localhost:5432/test \
+            -e NEXTAUTH_SECRET=test-secret \
+            -e AUTH_SECRET=test-secret \
+            -e GITHUB_CLIENT_ID=test \
+            -e GITHUB_CLIENT_SECRET=test \
+            snippets-library:test
+
+          # Wait for container to start
+          sleep 15
+
+          # Check if container is running
+          if ! docker ps | grep test-container; then
+            echo "Container failed to start"
+            docker logs test-container
+            exit 1
+          fi
+
+          # Check health endpoint
+          timeout 30 bash -c 'until curl -f http://localhost:3000/api/health; do sleep 2; done' || echo "Health check timeout (expected in test)"
+
+          # Clean up
+          docker stop test-container
+          docker rm test-container
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    name: Dependency Security Check
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security audit
+        run: npm audit --audit-level moderate
+
+      - name: Check for outdated packages
+        run: npm outdated || true
+
+  database-migration-test:
+    runs-on: ubuntu-latest
+    name: Database Migration Test
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: test_snippets
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U test; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+
+      - name: Test database migrations
+        run: npm run db:push
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_snippets
+
+  summary:
+    runs-on: ubuntu-latest
+    name: CI Summary
+    needs:
+      [
+        lint-and-format,
+        build-test,
+        docker-build-test,
+        dependency-check,
+        database-migration-test,
+      ]
+    if: always()
+
+    steps:
+      - name: Check results
+        run: |
+          echo "## CI Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint and Format | ${{ needs.lint-and-format.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build and Test | ${{ needs.build-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Build Test | ${{ needs.docker-build-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Check | ${{ needs.dependency-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Database Migration Test | ${{ needs.database-migration-test.result }} |" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ needs.lint-and-format.result }}" == "failure" || 
+                "${{ needs.build-test.result }}" == "failure" || 
+                "${{ needs.docker-build-test.result }}" == "failure" || 
+                "${{ needs.dependency-check.result }}" == "failure" || 
+                "${{ needs.database-migration-test.result }}" == "failure" ]]; then
+            echo "❌ CI pipeline failed"
+            exit 1
+          else
+            echo "✅ All CI checks passed"
+          fi

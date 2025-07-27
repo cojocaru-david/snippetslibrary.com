@@ -9,7 +9,7 @@ import React, {
   memo,
 } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useSettings } from "@/hooks/useSettings";
+import { useSettings } from "@/contexts/SettingsContext";
 import { shikiService } from "@/lib/shiki";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

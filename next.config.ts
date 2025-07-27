@@ -6,6 +6,9 @@ const withAnalyzer = withBundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+  // Output configuration for Docker
+  output: "standalone",
+
   // Strict mode
   reactStrictMode: true,
 

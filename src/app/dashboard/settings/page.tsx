@@ -2,7 +2,7 @@
 
 import { useState, useEffect, memo, useMemo, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { useSettings } from "@/hooks/useSettings";
+import { useSettings } from "@/contexts/SettingsContext";
 import {
   Card,
   CardContent,

@@ -7,10 +7,10 @@ import React, {
   useEffect,
   useCallback,
   useRef,
-  ReactNode,
 } from "react";
 import { useSession } from "next-auth/react";
 import { UserSettings } from "@/db/schema";
+import type { SettingsContextType, SettingsProviderProps } from "@/types";
 
 // Default settings defined here to avoid server imports on client
 const getDefaultSettings = (): UserSettings => ({
@@ -31,33 +31,9 @@ const getDefaultSettings = (): UserSettings => ({
   },
 });
 
-interface SettingsContextType {
-  settings: UserSettings | null;
-  loading: boolean;
-  error: string | null;
-  updateSettings: (newSettings: Partial<UserSettings>) => Promise<boolean>;
-  refreshSettings: () => Promise<void>;
-  updateCodeBlockSettings: (
-    settings: Partial<UserSettings["codeBlockSettings"]>,
-  ) => Promise<boolean>;
-  updateLayoutSettings: (
-    settings: Partial<UserSettings["layoutSettings"]>,
-  ) => Promise<boolean>;
-  updateSeoSettings: (
-    settings: Partial<UserSettings["seoSettings"]>,
-  ) => Promise<boolean>;
-  updateUserPreferences: (
-    preferences: Partial<UserSettings["userPreferences"]>,
-  ) => Promise<boolean>;
-}
-
 const SettingsContext = createContext<SettingsContextType | undefined>(
   undefined,
 );
-
-interface SettingsProviderProps {
-  children: ReactNode;
-}
 
 export function SettingsProvider({ children }: SettingsProviderProps) {
   const { data: session, status } = useSession();

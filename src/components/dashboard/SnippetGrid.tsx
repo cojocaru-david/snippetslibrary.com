@@ -1,21 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { SnippetCard } from "./SnippetCard";
-import type { Snippet } from "./types";
-
-interface SnippetGridProps {
-  snippets: Snippet[];
-  loading: boolean;
-  onEdit: (snippet: Snippet) => void;
-  onDelete: (id: string) => void;
-  onCopyShareUrl: (shareId: string) => void;
-  onOpenShareUrl: (shareId: string) => void;
-  userSettings?: {
-    codeBlockSettings?: {
-      theme?: string;
-    };
-  };
-}
+import type { SnippetGridProps } from "@/types";
 
 function SkeletonCard() {
   return (

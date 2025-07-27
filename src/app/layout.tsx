@@ -19,10 +19,83 @@ const outfit = Outfit({
   display: "swap",
 });
 
+const baseUrl =
+  process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
+
 export const metadata: Metadata = {
-  title: "Snippets Library - Modern Code Snippet Manager",
+  metadataBase: new URL(baseUrl),
+  title: {
+    default:
+      "Snippets Library - Modern Code Snippet Manager & Sharing Platform",
+    template: "%s - Snippets Library",
+  },
   description:
-    "Store, organize, and share code snippets with beautiful syntax highlighting, instant search, and public/private sharing. Built for developers.",
+    "Store, organize, and share code snippets with beautiful syntax highlighting, instant search, and secure public/private sharing. Built for developers who value clean code organization and seamless collaboration.",
+  keywords: [
+    "code snippets",
+    "programming tools",
+    "developer productivity",
+    "syntax highlighting",
+    "code sharing",
+    "snippet manager",
+    "development tools",
+    "programming library",
+    "code organization",
+    "developer collaboration",
+    "javascript snippets",
+    "python code",
+    "react components",
+    "typescript examples",
+    "web development",
+    "software engineering",
+  ],
+  authors: [{ name: "Snippets Library Team", url: baseUrl }],
+  creator: "Snippets Library",
+  publisher: "Snippets Library",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: baseUrl,
+    siteName: "Snippets Library",
+    title: "Snippets Library - Modern Code Snippet Manager & Sharing Platform",
+    description:
+      "Store, organize, and share code snippets with beautiful syntax highlighting, instant search, and secure public/private sharing. Built for developers who value clean code organization.",
+    images: [
+      {
+        url: `${baseUrl}/api/og?title=Snippets%20Library&description=Modern%20Code%20Snippet%20Manager`,
+        width: 1200,
+        height: 630,
+        alt: "Snippets Library - Code Snippet Manager",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Snippets Library - Modern Code Snippet Manager",
+    description:
+      "Store, organize, and share code snippets with beautiful syntax highlighting and instant search. Built for developers.",
+    images: [
+      `${baseUrl}/api/og?title=Snippets%20Library&description=Modern%20Code%20Snippet%20Manager`,
+    ],
+    creator: "@SnippetsLibrary",
+    site: "@SnippetsLibrary",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -32,6 +105,9 @@ export const metadata: Metadata = {
     apple: "/icons/apple-touch-icon.png",
   },
   manifest: "/manifest.json",
+  alternates: {
+    canonical: baseUrl,
+  },
 };
 
 const themeScript = `
@@ -64,10 +140,51 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "Snippets Library",
+    description:
+      "Modern code snippet manager and sharing platform for developers",
+    url: baseUrl,
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: "Web Browser",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    creator: {
+      "@type": "Organization",
+      name: "Snippets Library",
+      url: baseUrl,
+    },
+    featureList: [
+      "Code snippet storage and organization",
+      "Syntax highlighting for 100+ languages",
+      "Public and private sharing",
+      "Instant search functionality",
+      "GitHub OAuth authentication",
+      "Dark and light themes",
+      "Export and import capabilities",
+    ],
+    screenshot: `${baseUrl}/api/og?title=Snippets%20Library&description=Dashboard%20Preview`,
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
       </head>
       <body
         className={`${syne.variable} ${outfit.variable} antialiased min-h-screen bg-background flex flex-col`}

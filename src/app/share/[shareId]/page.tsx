@@ -6,34 +6,7 @@ import { snippets, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { generateOGImageUrl } from "@/lib/utils";
 import ShareSnippetClient from "./ShareSnippetClient";
-
-interface SharedSnippet {
-  id: string;
-  title: string;
-  description?: string;
-  code: string;
-  language: string;
-  tags: string[];
-  isPublic: boolean;
-  shareId: string;
-  viewCount: number;
-  createdAt: string;
-  updatedAt: string;
-  userName?: string;
-  displayTheme?: string;
-}
-
-interface SEOSettings {
-  title?: string;
-  description?: string;
-  keywords?: string[];
-}
-
-interface PageProps {
-  params: Promise<{
-    shareId: string;
-  }>;
-}
+import type { SharedSnippet, SEOSettings, PageProps } from "@/types";
 
 async function getSnippetData(shareId: string): Promise<{
   snippet: SharedSnippet | null;
@@ -127,40 +100,75 @@ export async function generateMetadata({
     return {
       title: "Snippet Not Found - Snippets Library",
       description:
-        "The requested code snippet was not found or is no longer public.",
+        "The requested code snippet was not found or is no longer public. Browse other amazing code snippets and programming resources on Snippets Library.",
+      robots: {
+        index: false,
+        follow: false,
+      },
     };
   }
 
-  const titleParts = [
-    snippet.title,
-    seoSettings?.title,
-    "Snippets Library",
-  ].filter(Boolean);
+  // Ensure we always have a comprehensive description
+  // const fallbackDescription = `Explore this ${snippet.language} code snippet: "${snippet.title}". Part of a curated collection of programming resources on Snippets Library - your go-to platform for discovering, sharing, and organizing code snippets.`;
 
-  const descriptionParts = [
-    snippet.description,
-    seoSettings?.description,
-    "Powered by SnippetsLibrary.com",
-  ].filter(Boolean);
+  const snippetDescription =
+    snippet.description && snippet.description.trim()
+      ? snippet.description.trim()
+      : `A useful ${snippet.language} code snippet demonstrating ${snippet.title.toLowerCase()}.`;
 
-  const title = titleParts.join(" - ");
-  const description = descriptionParts.join(" - ");
+  const seoDescription =
+    seoSettings?.description && seoSettings.description.trim()
+      ? seoSettings.description.trim()
+      : "Discover amazing code snippets and programming resources.";
 
+  // Create a comprehensive description ensuring we always have meaningful content
+  const description = `${snippetDescription} ${seoDescription} Powered by Snippets Library - the ultimate platform for developers to store, organize, and share code snippets.`;
+
+  // Ensure title is comprehensive and SEO-friendly
+  const snippetTitle =
+    snippet.title && snippet.title.trim()
+      ? snippet.title.trim()
+      : `${snippet.language} Code Snippet`;
+
+  const seoTitle =
+    seoSettings?.title && seoSettings.title.trim()
+      ? seoSettings.title.trim()
+      : "Code Snippets & Programming Resources";
+
+  const title = `${snippetTitle} - ${seoTitle} | Snippets Library`;
+
+  // Comprehensive keywords combining all relevant terms
   const defaultKeywords = [
-    "code",
-    "snippet",
+    "code snippet",
     "programming",
     "development",
-    "snippets",
-    "snippetslibrary",
+    "software engineering",
+    snippet.language.toLowerCase(),
+    `${snippet.language.toLowerCase()} code`,
+    `${snippet.language.toLowerCase()} snippet`,
+    "developer tools",
+    "coding resources",
     "snippets library",
-    "snippets library.com",
+    "code sharing",
+    "programming examples",
   ];
+
   const userKeywords = seoSettings?.keywords || [];
-  const snippetKeywords = [snippet.language, ...snippet.tags];
+  const snippetKeywords = [snippet.language, ...snippet.tags].map((k) =>
+    k.toLowerCase(),
+  );
+  const titleKeywords = snippet.title
+    .toLowerCase()
+    .split(/[\s\-_]+/)
+    .filter((word) => word.length > 2);
 
   const keywords = [
-    ...new Set([...defaultKeywords, ...userKeywords, ...snippetKeywords]),
+    ...new Set([
+      ...defaultKeywords,
+      ...userKeywords,
+      ...snippetKeywords,
+      ...titleKeywords,
+    ]),
   ];
 
   const baseUrl =
@@ -177,7 +185,7 @@ export async function generateMetadata({
 
   const ogImageUrl = generateOGImageUrl({
     title: snippet.title,
-    description: snippet.description || description,
+    description: snippetDescription,
     language: snippet.language,
     theme: themePreference,
     author: snippet.userName,
@@ -185,14 +193,26 @@ export async function generateMetadata({
     baseUrl,
   });
 
+  const authorName = snippet.userName || "Anonymous Developer";
+
   return {
     title,
     description,
     keywords: keywords.join(", "),
-    authors: [{ name: snippet.userName || "Anonymous Developer" }],
+    authors: [{ name: authorName }],
     creator: snippet.userName || "Snippets Library",
     publisher: "Snippets Library",
-    robots: "index, follow",
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
     openGraph: {
       title,
       description,
@@ -201,56 +221,89 @@ export async function generateMetadata({
       siteName: "Snippets Library",
       publishedTime: snippet.createdAt,
       modifiedTime: snippet.updatedAt,
-      authors: [snippet.userName || "Anonymous Developer"],
-      tags: keywords,
+      authors: [authorName],
+      tags: keywords.slice(0, 10),
       images: [
         {
           url: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: `${snippet.title} - ${snippet.language} code snippet`,
+          alt: `${snippet.title} - ${snippet.language} code snippet by ${authorName}`,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description,
+      title:
+        title.length > 70
+          ? `${snippetTitle} - ${snippet.language} Code`
+          : title,
+      description:
+        description.length > 200
+          ? description.substring(0, 197) + "..."
+          : description,
       creator: snippet.userName ? `@${snippet.userName}` : "@SnippetsLibrary",
+      site: "@SnippetsLibrary",
       images: [ogImageUrl],
     },
     alternates: {
       canonical: shareUrl,
     },
     other: {
-      "article:author": snippet.userName || "Anonymous",
+      "article:author": authorName,
       "article:published_time": snippet.createdAt,
       "article:modified_time": snippet.updatedAt,
       "article:section": "Programming",
       "article:tag": snippet.tags.join(", "),
+      "programming-language": snippet.language,
+      "code-lines": snippet.code.split("\n").length.toString(),
+      "snippet-tags": snippet.tags.join(", "),
     },
   };
 }
 
-function generateStructuredData(
-  snippet: SharedSnippet,
-  seoSettings: SEOSettings | null,
-) {
+function generateStructuredData(snippet: SharedSnippet) {
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
+
+  const authorName = snippet.userName || "Anonymous Developer";
+  const snippetDescription =
+    snippet.description && snippet.description.trim()
+      ? snippet.description.trim()
+      : `A useful ${snippet.language} code snippet demonstrating ${snippet.title.toLowerCase()}.`;
 
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareSourceCode",
-    name: snippet.title + " - " + seoSettings?.title,
-    description:
-      snippet.description ||
-      `${snippet.language} code snippet: ${snippet.title}`,
-    programmingLanguage: snippet.language,
+    name: snippet.title,
+    description: snippetDescription,
+    text: snippet.code,
+    programmingLanguage: {
+      "@type": "ComputerLanguage",
+      name: snippet.language,
+      alternateName: snippet.language.toLowerCase(),
+    },
     codeRepository: `${baseUrl}/share/${snippet.shareId}`,
+    url: `${baseUrl}/share/${snippet.shareId}`,
     author: {
       "@type": "Person",
-      name: snippet.userName || "Anonymous Developer",
+      name: authorName,
+      url: snippet.userName ? `${baseUrl}/user/${snippet.userName}` : undefined,
+    },
+    creator: {
+      "@type": "Person",
+      name: authorName,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Snippets Library",
+      url: baseUrl,
+      logo: {
+        "@type": "ImageObject",
+        url: `${baseUrl}/favicon-96x96.png`,
+        width: 96,
+        height: 96,
+      },
     },
     codeSampleType: "full",
     runtimePlatform: snippet.language,
@@ -259,11 +312,15 @@ function generateStructuredData(
       ...snippet.tags,
       snippet.language,
       "programming",
-      "code",
-      "snippet",
+      "code snippet",
+      "development",
+      "software engineering",
     ].join(", "),
     dateCreated: snippet.createdAt,
     dateModified: snippet.updatedAt,
+    datePublished: snippet.createdAt,
+    license: "https://opensource.org/licenses/MIT",
+    version: "1.0",
     interactionStatistic: {
       "@type": "InteractionCounter",
       interactionType: "https://schema.org/ViewAction",
@@ -272,12 +329,67 @@ function generateStructuredData(
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": `${baseUrl}/share/${snippet.shareId}`,
+      name: `${snippet.title} - Code Snippet`,
+      description: snippetDescription,
+      url: `${baseUrl}/share/${snippet.shareId}`,
+      inLanguage: "en-US",
     },
-    publisher: {
-      "@type": "Organization",
+    isPartOf: {
+      "@type": "WebSite",
+      "@id": baseUrl,
       name: "Snippets Library",
-      url: "https://snippetslibrary.com",
+      url: baseUrl,
+      description:
+        "Modern code snippet manager and sharing platform for developers",
     },
+    potentialAction: [
+      {
+        "@type": "ViewAction",
+        target: `${baseUrl}/share/${snippet.shareId}`,
+        name: "View Code Snippet",
+      },
+      {
+        "@type": "ShareAction",
+        target: `${baseUrl}/share/${snippet.shareId}`,
+        name: "Share Code Snippet",
+      },
+    ],
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Snippets Library",
+          item: baseUrl,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Code Snippets",
+          item: `${baseUrl}/snippets`,
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: snippet.language,
+          item: `${baseUrl}/snippets?language=${encodeURIComponent(snippet.language)}`,
+        },
+        {
+          "@type": "ListItem",
+          position: 4,
+          name: snippet.title,
+          item: `${baseUrl}/share/${snippet.shareId}`,
+        },
+      ],
+    },
+    ...(snippet.tags.length > 0 && {
+      about: snippet.tags.map((tag) => ({
+        "@type": "Thing",
+        name: tag,
+        description: `Programming concept: ${tag}`,
+      })),
+    }),
   };
 }
 
@@ -289,7 +401,7 @@ export default async function ShareSnippetPage({ params }: PageProps) {
     notFound();
   }
 
-  const structuredData = generateStructuredData(snippet, null);
+  const structuredData = generateStructuredData(snippet);
 
   return (
     <>

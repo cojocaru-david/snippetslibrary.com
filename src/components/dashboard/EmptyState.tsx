@@ -1,12 +1,7 @@
 import React from "react";
 import { Code, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface EmptyStateProps {
-  hasActiveFilters: boolean;
-  onCreateSnippet: () => void;
-  onClearAllFilters: () => void;
-}
+import type { EmptyStateProps } from "@/types";
 
 export function EmptyState({
   hasActiveFilters,

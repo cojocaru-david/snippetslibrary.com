@@ -1,31 +1,10 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from "react";
-import { Session } from "next-auth";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useSession, signIn, signOut, getSession } from "next-auth/react";
-
-interface AuthContextType {
-  session: Session | null;
-  status: "loading" | "authenticated" | "unauthenticated";
-  user: Session["user"] | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  signIn: typeof signIn;
-  signOut: (options?: { callbackUrl?: string }) => Promise<void>;
-  refreshSession: () => Promise<void>;
-}
+import type { AuthContextType, AuthProviderProps } from "@/types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const { data: session, status } = useSession();

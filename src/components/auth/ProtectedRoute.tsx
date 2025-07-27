@@ -1,12 +1,7 @@
 "use client";
 
 import { useRequireAuth } from "@/contexts/AuthContext";
-import { ReactNode } from "react";
-
-interface ProtectedRouteProps {
-  children: ReactNode;
-  fallback?: ReactNode;
-}
+import type { ProtectedRouteProps } from "@/types";
 
 export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading } = useRequireAuth("/dashboard");

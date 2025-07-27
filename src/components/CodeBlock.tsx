@@ -23,6 +23,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import type { CodeBlockProps } from "@/types";
 
 const LANGUAGE_MAPPING: Record<string, string> = {
   js: "javascript",
@@ -88,22 +89,6 @@ const FILE_EXTENSION_MAPPING: Record<string, string> = {
 function sanitizeText(text: string): string {
   if (!text || typeof text !== "string") return "";
   return text;
-}
-
-interface CodeBlockProps {
-  children?: React.ReactNode;
-  className?: string;
-  code: string;
-  language: string;
-  highlightTheme?: string;
-  title?: string;
-  showCopyButton?: boolean;
-  showDownloadButton?: boolean;
-  showExpandButton?: boolean;
-  rounded?: boolean;
-  maxHeight?: string;
-  hideScroll?: boolean;
-  filename?: string;
 }
 
 export const CodeBlock = memo<CodeBlockProps>(

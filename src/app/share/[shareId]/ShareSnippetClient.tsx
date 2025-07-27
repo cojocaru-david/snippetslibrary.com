@@ -25,34 +25,7 @@ import { formatDate, formatNumber, formatRelativeTime } from "@/lib/utils";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
-
-interface SharedSnippet {
-  id: string;
-  title: string;
-  description?: string;
-  code: string;
-  language: string;
-  tags: string[];
-  isPublic: boolean;
-  shareId: string;
-  viewCount: number;
-  createdAt: string;
-  updatedAt: string;
-  userName?: string;
-  displayTheme?: string;
-}
-
-interface SEOSettings {
-  title?: string;
-  description?: string;
-  keywords?: string[];
-}
-
-interface ShareSnippetClientProps {
-  snippet: SharedSnippet;
-  seoSettings: SEOSettings | null;
-  ownerHighlightTheme?: string;
-}
+import type { ShareSnippetClientProps } from "@/types";
 
 export default function ShareSnippetClient({
   snippet,

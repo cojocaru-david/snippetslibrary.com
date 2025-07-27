@@ -20,7 +20,7 @@ import {
   SearchBar,
   LazyPagination,
 } from "@/components/dashboard";
-import type { Snippet, PaginationInfo } from "@/components/dashboard/types";
+import type { Snippet, PaginationInfo } from "@/types";
 import { SnippetModal } from "@/components/SnippetModal";
 
 export default function DashboardPage() {

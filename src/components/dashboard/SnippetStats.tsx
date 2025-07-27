@@ -1,11 +1,6 @@
 import React from "react";
 import { Code, Search } from "lucide-react";
-import type { PaginationInfo } from "./types";
-
-interface SnippetStatsProps {
-  pagination: PaginationInfo;
-  searchTerm?: string;
-}
+import type { SnippetStatsProps } from "@/types";
 
 export function SnippetStats({ pagination, searchTerm }: SnippetStatsProps) {
   return (

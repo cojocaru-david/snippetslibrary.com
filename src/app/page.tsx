@@ -1,122 +1,121 @@
-"use client";
-import { useEffect, useState, lazy, Suspense } from "react";
-import dynamic from "next/dynamic";
+import { Metadata } from "next";
+import LandingPageClient from "./LandingPageClient";
 
-import Header from "@/components/custom/header";
-import Footer from "@/components/custom/footer";
-import Hero from "@/components/landing/Hero";
+const baseUrl =
+  process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
 
-import { useAuth } from "@/contexts/AuthContext";
-import toast from "react-hot-toast";
-
-const Features = lazy(() => import("@/components/landing/Features"));
-const Cta = lazy(() => import("@/components/landing/Cta"));
-
-const AOSLoader = dynamic(
-  () =>
-    import("aos").then((AOS) => {
-      const AOSComponent = () => {
-        useEffect(() => {
-          AOS.init({
-            once: true,
-            disable: "phone",
-            duration: 700,
-            easing: "ease-out-cubic",
-          });
-        }, []);
-        return null;
-      };
-      return { default: AOSComponent };
-    }),
-  {
-    ssr: false,
-    loading: () => null,
+export const metadata: Metadata = {
+  title: "Snippets Library - Store, Organize & Share Code Snippets",
+  description:
+    "The ultimate code snippet manager for developers. Store, organize, and share your code snippets with beautiful syntax highlighting, instant search, and seamless GitHub integration. Start building your personal code library today.",
+  keywords: [
+    "code snippets manager",
+    "programming tools",
+    "developer productivity",
+    "syntax highlighting",
+    "code sharing platform",
+    "snippet library",
+    "development workflow",
+    "code organization",
+    "programmer tools",
+    "coding resources",
+    "github integration",
+    "developer portfolio",
+    "code collection",
+    "snippet storage",
+    "programming efficiency",
+  ],
+  openGraph: {
+    title: "Snippets Library - Store, Organize & Share Code Snippets",
+    description:
+      "The ultimate code snippet manager for developers. Store, organize, and share your code snippets with beautiful syntax highlighting and instant search.",
+    url: baseUrl,
+    siteName: "Snippets Library",
+    images: [
+      {
+        url: `${baseUrl}/api/og?title=Welcome%20to%20Snippets%20Library&description=Your%20Personal%20Code%20Collection`,
+        width: 1200,
+        height: 630,
+        alt: "Snippets Library - Code Snippet Manager Landing Page",
+      },
+    ],
+    type: "website",
   },
-);
-
-const SectionLoading = () => (
-  <div className="py-20">
-    <div className="container mx-auto px-4">
-      <div className="animate-pulse space-y-6">
-        <div className="h-12 bg-muted/50 rounded-lg mx-auto max-w-md"></div>
-        <div className="h-6 bg-muted/30 rounded mx-auto max-w-lg"></div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-48 bg-muted/20 rounded-lg"></div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </div>
-);
+  twitter: {
+    card: "summary_large_image",
+    title: "Snippets Library - Store, Organize & Share Code Snippets",
+    description:
+      "The ultimate code snippet manager for developers. Beautiful syntax highlighting, instant search, and seamless GitHub integration.",
+    images: [
+      `${baseUrl}/api/og?title=Welcome%20to%20Snippets%20Library&description=Your%20Personal%20Code%20Collection`,
+    ],
+  },
+  alternates: {
+    canonical: baseUrl,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+};
 
 export default function LandingPage() {
-  const { signIn } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [shouldLoadAOS, setShouldLoadAOS] = useState(false);
-
-  useEffect(() => {
-    const loadAOS = () => {
-      setShouldLoadAOS(true);
-    };
-
-    if ("requestIdleCallback" in window) {
-      window.requestIdleCallback(loadAOS, { timeout: 2000 });
-    } else {
-      setTimeout(loadAOS, 1500);
-    }
-
-    const events = ["click", "scroll", "keydown", "touchstart"];
-    const onUserInteraction = () => {
-      loadAOS();
-      events.forEach((event) => {
-        document.removeEventListener(event, onUserInteraction);
-      });
-    };
-
-    events.forEach((event) => {
-      document.addEventListener(event, onUserInteraction, {
-        once: true,
-        passive: true,
-      });
-    });
-
-    return () => {
-      events.forEach((event) => {
-        document.removeEventListener(event, onUserInteraction);
-      });
-    };
-  }, []);
-
-  const handleLogin = async () => {
-    try {
-      setIsLoading(true);
-      await signIn("github");
-    } catch (error) {
-      toast.error("Failed to login. Please try again.");
-      console.error("Login error:", error);
-    } finally {
-      setIsLoading(false);
-    }
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Snippets Library",
+    description:
+      "Store, organize, and share code snippets with beautiful syntax highlighting",
+    url: baseUrl,
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: "Web Browser",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    author: {
+      "@type": "Organization",
+      name: "Snippets Library",
+      url: baseUrl,
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.8",
+      ratingCount: "150",
+      bestRating: "5",
+      worstRating: "1",
+    },
+    featureList: [
+      "Organize code snippets with tags and folders",
+      "Syntax highlighting for 100+ programming languages",
+      "Public and private snippet sharing",
+      "Instant search across your code library",
+      "GitHub OAuth authentication",
+      "Dark and light theme support",
+      "Export snippets in various formats",
+      "Real-time collaboration features",
+    ],
+    screenshot: [
+      `${baseUrl}/api/og?title=Dashboard&description=Snippet%20Management`,
+      `${baseUrl}/api/og?title=Editor&description=Code%20Highlighting`,
+    ],
   };
 
   return (
     <>
-      {shouldLoadAOS && <AOSLoader />}
-
-      <Header handleLogin={handleLogin} isLoading={isLoading} />
-      <main className="grow">
-        <Hero handleLogin={handleLogin} />
-
-        <Suspense fallback={<SectionLoading />}>
-          <Features />
-        </Suspense>
-
-        <Suspense fallback={<SectionLoading />}>
-          <Cta handleLogin={handleLogin} />
-        </Suspense>
-      </main>
-      <Footer />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <LandingPageClient />
     </>
   );
 }

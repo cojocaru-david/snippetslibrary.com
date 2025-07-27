@@ -1,169 +1,111 @@
-"use client";
+import { Metadata } from "next";
+import SignInPageClient from "./SignInPageClient";
 
-import { useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Github } from "lucide-react";
-import { useState } from "react";
-import PageIllustration from "@/components/landing/PageIllustration";
-import Logo from "@/components/custom/logo";
-import { useAuth } from "@/contexts/AuthContext";
+const baseUrl =
+  process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
 
-function SignInContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { signIn, isAuthenticated, isLoading } = useAuth();
-  const [loading, setLoading] = useState(false);
+export const metadata: Metadata = {
+  title: "Sign In - Snippets Library",
+  description:
+    "Sign in to your Snippets Library account with GitHub OAuth. Access your personal code snippet collection, organize your development workflow, and share snippets with the community.",
+  keywords: [
+    "sign in",
+    "login",
+    "github oauth",
+    "developer authentication",
+    "code snippets access",
+    "user account",
+    "snippets library login",
+    "github integration",
+    "developer tools login",
+  ],
+  openGraph: {
+    title: "Sign In - Snippets Library",
+    description:
+      "Sign in to your Snippets Library account with GitHub OAuth. Access your personal code snippet collection and development tools.",
+    url: `${baseUrl}/auth/signin`,
+    siteName: "Snippets Library",
+    type: "website",
+    images: [
+      {
+        url: `${baseUrl}/api/og?title=Welcome%20Back&description=Sign%20In%20to%20Your%20Account`,
+        width: 1200,
+        height: 630,
+        alt: "Snippets Library Sign In Page",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sign In - Snippets Library",
+    description:
+      "Sign in to your Snippets Library account with GitHub OAuth. Access your code snippet collection.",
+    images: [
+      `${baseUrl}/api/og?title=Welcome%20Back&description=Sign%20In%20to%20Your%20Account`,
+    ],
+  },
+  alternates: {
+    canonical: `${baseUrl}/auth/signin`,
+  },
+  robots: {
+    index: false, // Don't index authentication pages
+    follow: true,
+    googleBot: {
+      index: false,
+      follow: true,
+    },
+  },
+};
 
-  const rawCallbackUrl = searchParams?.get("callbackUrl");
-  const callbackUrl = (() => {
-    if (!rawCallbackUrl) return "/dashboard";
-    try {
-      const decoded = decodeURIComponent(rawCallbackUrl);
-      if (
-        decoded.startsWith("http://localhost") ||
-        decoded.startsWith("https://")
-      ) {
-        const url = new URL(decoded);
-        return url.pathname + url.search;
-      }
-      return decoded.startsWith("/") ? decoded : "/dashboard";
-    } catch {
-      return "/dashboard";
-    }
-  })();
-
-  const error = searchParams?.get("error");
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      router.push(callbackUrl);
-    }
-  }, [isAuthenticated, isLoading, callbackUrl, router]);
-
-  const handleSignIn = async () => {
-    setLoading(true);
-    try {
-      await signIn("github", { callbackUrl });
-    } catch (error) {
-      console.error("Sign in error:", error);
-    } finally {
-      setLoading(false);
-    }
+export default function SignInPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "Sign In - Snippets Library",
+    description: "User authentication page for Snippets Library platform",
+    url: `${baseUrl}/auth/signin`,
+    publisher: {
+      "@type": "Organization",
+      name: "Snippets Library",
+      url: baseUrl,
+    },
+    inLanguage: "en-US",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "Snippets Library",
+      url: baseUrl,
+    },
+    potentialAction: {
+      "@type": "AuthenticateAction",
+      target: `${baseUrl}/auth/signin`,
+      name: "Sign In with GitHub",
+    },
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: baseUrl,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Sign In",
+          item: `${baseUrl}/auth/signin`,
+        },
+      ],
+    },
   };
 
   return (
-    <div className="relative min-h-screen bg-background">
-      <PageIllustration />
-
-      <div className="relative z-10 px-4 sm:px-6 pt-8">
-        <div className="flex justify-between items-center">
-          <Logo />
-          <button
-            onClick={() => router.push("/")}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" /> Back to home
-          </button>
-        </div>
-      </div>
-
-      <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-200px)] px-4 sm:px-6">
-        <div className="w-full max-w-md mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-4 border-b pb-6 [border-image:linear-gradient(to_right,transparent,var(--color-border),transparent)1]">
-              Welcome back
-            </h1>
-            <p className="text-base text-muted-foreground leading-relaxed">
-              Sign in to access your code snippets and continue building amazing
-              things.
-            </p>
-          </div>
-
-          {error && (
-            <div className="mb-8 bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm text-center">
-              {error === "OAuthCallback" &&
-                "There was an error with the OAuth provider."}
-              {error === "AccessDenied" &&
-                "Access was denied. Please try again."}
-              {error === "Verification" &&
-                "The verification link was invalid or has expired."}
-              {!["OAuthCallback", "AccessDenied", "Verification"].includes(
-                error,
-              ) && `An error occurred during sign in: ${error}`}
-            </div>
-          )}
-
-          <div className="relative before:inset-0 before:border-y before:[border-image:linear-gradient(to_right,transparent,var(--color-border),transparent)1]">
-            <div className="space-y-4 py-8">
-              <div className="flex justify-center">
-                <Button
-                  onClick={handleSignIn}
-                  disabled={loading || isLoading}
-                  className="group w-full h-12 bg-primary bg-gradient-to-t from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 transition-all duration-200 shadow-lg hover:shadow-xl"
-                  size="lg"
-                >
-                  <span className="flex items-center justify-center gap-3">
-                    <Github className="w-5 h-5" />
-                    {loading || isLoading
-                      ? "Signing in..."
-                      : "Continue with GitHub"}
-                    {!loading && !isLoading && (
-                      <span className="ml-1 tracking-normal text-primary-foreground/70 transition-transform group-hover:translate-x-0.5">
-                        <ArrowRight className="w-4 h-4" />
-                      </span>
-                    )}
-                  </span>
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center mt-8">
-            <p className="text-xs text-muted-foreground">
-              By signing in, you agree to our terms of service and privacy
-              policy.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SignInFallback() {
-  return (
-    <div className="relative min-h-screen bg-background">
-      <PageIllustration />
-
-      <div className="relative z-10 px-4 sm:px-6 pt-8">
-        <div className="flex justify-center">
-          <Logo />
-        </div>
-      </div>
-
-      <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-200px)] px-4 sm:px-6">
-        <div className="w-full max-w-md mx-auto text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-4 border-b pb-6 [border-image:linear-gradient(to_right,transparent,var(--color-border),transparent)1]">
-            Welcome back
-          </h1>
-          <p className="text-base text-muted-foreground leading-relaxed">
-            Loading sign in options...
-          </p>
-          <div className="mt-8">
-            <div className="animate-pulse bg-muted h-12 rounded-lg"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function SignInPage() {
-  return (
-    <Suspense fallback={<SignInFallback />}>
-      <SignInContent />
-    </Suspense>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <SignInPageClient />
+    </>
   );
 }

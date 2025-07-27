@@ -27,20 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LazyCodeBlock } from "@/components/dashboard/LazyComponents";
 import { formatDate, formatRelativeTime, truncateCode } from "@/lib/utils";
-import type { Snippet } from "./types";
-
-interface SnippetCardProps {
-  snippet: Snippet;
-  onEdit: (snippet: Snippet) => void;
-  onDelete: (id: string) => void;
-  onCopyShareUrl: (shareId: string) => void;
-  onOpenShareUrl: (shareId: string) => void;
-  userSettings?: {
-    codeBlockSettings?: {
-      theme?: string;
-    };
-  };
-}
+import type { SnippetCardProps } from "@/types";
 
 export const SnippetCard = memo<SnippetCardProps>(function SnippetCard({
   snippet,

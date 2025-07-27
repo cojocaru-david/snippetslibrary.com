@@ -10,21 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface SnippetFiltersProps {
-  showFilters: boolean;
-  setShowFilters: (show: boolean) => void;
-  selectedLanguage: string;
-  setSelectedLanguage: (language: string) => void;
-  selectedVisibility: string;
-  setSelectedVisibility: (visibility: string) => void;
-  selectedTags: string[];
-  setSelectedTags: (tags: string[]) => void;
-  availableLanguages: string[];
-  availableTags: string[];
-  activeFiltersCount: number;
-  onClearAllFilters: () => void;
-}
+import type { SnippetFiltersProps } from "@/types";
 
 export function SnippetFilters({
   showFilters,

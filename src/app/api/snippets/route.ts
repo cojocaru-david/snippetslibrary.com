@@ -6,15 +6,7 @@ import { snippets } from "@/db/schema";
 import { eq, desc, and, or, ilike, count, sql } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-
-const createSnippetSchema = z.object({
-  title: z.string().min(1, "Title is required").max(200, "Title too long"),
-  description: z.string().optional(),
-  code: z.string().min(1, "Code is required"),
-  language: z.string().min(1, "Language is required"),
-  tags: z.array(z.string()).default([]),
-  isPublic: z.boolean().default(false),
-});
+import { createSnippetSchema } from "@/types";
 
 export async function GET(request: NextRequest) {
   try {

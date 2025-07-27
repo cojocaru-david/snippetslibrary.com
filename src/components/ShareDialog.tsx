@@ -23,19 +23,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Badge } from "./ui/badge";
 import toast from "react-hot-toast";
-
-interface ShareDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  snippet: {
-    id: string;
-    title: string;
-    description?: string | null;
-    shareId?: string | null;
-    isPublic: boolean;
-  };
-  onGenerateShareLink: (snippetId: string) => Promise<string>;
-}
+import type { ShareDialogProps } from "@/types";
 
 export function ShareDialog({
   isOpen,

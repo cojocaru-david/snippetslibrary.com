@@ -1,10 +1,112 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/custom/logo";
 
+const baseUrl =
+  process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
+
+export const metadata: Metadata = {
+  title: "Terms of Service - Snippets Library",
+  description:
+    "Read our comprehensive Terms of Service for Snippets Library. Learn about user rights, content policies, privacy protection, and guidelines for using our code snippet management platform responsibly.",
+  keywords: [
+    "terms of service",
+    "user agreement",
+    "code snippet policies",
+    "snippets library terms",
+    "user rights",
+    "content guidelines",
+    "privacy policy",
+    "developer tools terms",
+    "software license",
+    "user responsibilities",
+  ],
+  openGraph: {
+    title: "Terms of Service - Snippets Library",
+    description:
+      "Read our comprehensive Terms of Service for Snippets Library. Learn about user rights, content policies, and usage guidelines.",
+    url: `${baseUrl}/terms`,
+    siteName: "Snippets Library",
+    type: "article",
+    images: [
+      {
+        url: `${baseUrl}/api/og?title=Terms%20of%20Service&description=Legal%20Guidelines%20for%20Snippets%20Library`,
+        width: 1200,
+        height: 630,
+        alt: "Snippets Library Terms of Service",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terms of Service - Snippets Library",
+    description:
+      "Read our comprehensive Terms of Service for Snippets Library. Learn about user rights and content policies.",
+    images: [
+      `${baseUrl}/api/og?title=Terms%20of%20Service&description=Legal%20Guidelines%20for%20Snippets%20Library`,
+    ],
+  },
+  alternates: {
+    canonical: `${baseUrl}/terms`,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+    },
+  },
+};
+
 export default function TermsPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "Terms of Service - Snippets Library",
+    description:
+      "Comprehensive terms of service and user agreement for Snippets Library platform",
+    url: `${baseUrl}/terms`,
+    publisher: {
+      "@type": "Organization",
+      name: "Snippets Library",
+      url: baseUrl,
+    },
+    dateModified: "2025-01-27",
+    inLanguage: "en-US",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "Snippets Library",
+      url: baseUrl,
+    },
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: baseUrl,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Terms of Service",
+          item: `${baseUrl}/terms`,
+        },
+      ],
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+
       <div className="min-h-screen bg-background">
         {/* Header */}
         <header className="border-b">

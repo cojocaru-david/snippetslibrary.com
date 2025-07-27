@@ -7,15 +7,7 @@ import React, {
   useState,
   useCallback,
 } from "react";
-
-type UITheme = "dark" | "light" | "system";
-
-interface ThemeContextType {
-  theme: UITheme;
-  setTheme: (theme: UITheme) => void;
-  resolvedTheme: "dark" | "light";
-  isLoading: boolean;
-}
+import type { UITheme, ThemeContextType } from "@/types";
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 

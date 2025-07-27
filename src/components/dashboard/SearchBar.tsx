@@ -2,13 +2,7 @@ import React from "react";
 import { Search, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-interface SearchBarProps {
-  searchTerm: string;
-  onSearchChange: (value: string) => void;
-  onCreateSnippet: () => void;
-  children?: React.ReactNode; // For filters component
-}
+import type { SearchBarProps } from "@/types";
 
 export function SearchBar({
   searchTerm,

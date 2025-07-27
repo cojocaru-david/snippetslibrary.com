@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Copy,
   Check,
@@ -38,49 +37,8 @@ import { Combobox } from "@/components/ui/combobox";
 import { cn } from "@/lib/utils";
 import { getAllLanguages } from "@/lib/shiki";
 import toast from "react-hot-toast";
-
-const snippetSchema = z.object({
-  title: z
-    .string()
-    .min(1, "Title is required")
-    .max(200, "Title must be less than 200 characters")
-    .refine((val) => val.trim().length > 0, "Title cannot be empty"),
-  description: z
-    .string()
-    .max(1000, "Description must be less than 1000 characters")
-    .optional(),
-  code: z
-    .string()
-    .min(1, "Code is required")
-    .max(50000, "Code must be less than 50,000 characters")
-    .refine((val) => val.trim().length > 0, "Code cannot be empty"),
-  language: z.string().min(1, "Language is required"),
-  tags: z.string().max(500, "Tags must be less than 500 characters").optional(),
-  isPublic: z.boolean(),
-});
-
-type SnippetFormData = z.infer<typeof snippetSchema>;
-
-interface Snippet {
-  id: string;
-  title: string;
-  description?: string;
-  code: string;
-  language: string;
-  tags: string[];
-  isPublic: boolean;
-  shareId?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface SnippetModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess?: () => void;
-  snippet?: Snippet;
-  mode?: "create" | "edit" | "view";
-}
+import type { SnippetFormData, SnippetModalProps } from "@/types";
+import { snippetSchema } from "@/types";
 
 const ALL_LANGUAGE_OPTIONS = getAllLanguages();
 const ALL_LANGUAGES = ALL_LANGUAGE_OPTIONS.map((lang) => lang.value);
@@ -159,7 +117,8 @@ export function SnippetModal({
   const [viewMode, setViewMode] = useState<"edit" | "preview">("edit");
   const [isDetectingLanguage, setIsDetectingLanguage] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
-  const [hasManuallySelectedLanguage, setHasManuallySelectedLanguage] = useState(false);
+  const [hasManuallySelectedLanguage, setHasManuallySelectedLanguage] =
+    useState(false);
 
   const {
     register,
@@ -247,8 +206,8 @@ export function SnippetModal({
 
   useEffect(() => {
     if (
-      debouncedCode && 
-      debouncedCode.length > 50 && 
+      debouncedCode &&
+      debouncedCode.length > 50 &&
       !hasManuallySelectedLanguage &&
       (!watchedValues.language || watchedValues.language === "javascript")
     ) {
@@ -264,7 +223,12 @@ export function SnippetModal({
         })
         .catch(console.warn);
     }
-  }, [debouncedCode, setValue, watchedValues.language, hasManuallySelectedLanguage]);
+  }, [
+    debouncedCode,
+    setValue,
+    watchedValues.language,
+    hasManuallySelectedLanguage,
+  ]);
 
   const handleClose = useCallback(() => {
     reset();

@@ -6,6 +6,7 @@ export default function robots(): MetadataRoute.Robots {
 
   return {
     rules: [
+      // Main rules for all search engines
       {
         userAgent: "*",
         allow: [
@@ -19,13 +20,36 @@ export default function robots(): MetadataRoute.Robots {
           "/api/*", // API endpoints
           "/auth/error", // Error pages
           "/_next/*", // Build assets
+          "/dashboard", // Dashboard root
+          "/admin/*", // Admin areas if any
         ],
       },
-      // Allow search engines to index public snippets more frequently
+      // Specific rules for Google
       {
         userAgent: "Googlebot",
-        allow: "/share/*",
+        allow: ["/share/*", "/", "/terms"],
+        disallow: ["/dashboard", "/api/*", "/auth/*", "/_next/*"],
         crawlDelay: 1,
+      },
+      // Rules for Bing
+      {
+        userAgent: "Bingbot",
+        allow: ["/share/*", "/", "/terms"],
+        disallow: ["/dashboard/*", "/api/*", "/auth/*", "/_next/*"],
+        crawlDelay: 2,
+      },
+      // Rules for other search engines
+      {
+        userAgent: [
+          "Slurp",
+          "DuckDuckBot",
+          "facebookexternalhit",
+          "Baiduspider",
+          "YandexBot",
+        ],
+        allow: ["/share/*", "/"],
+        disallow: ["/dashboard/*", "/api/*", "/auth/*", "/_next/*"],
+        crawlDelay: 3,
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

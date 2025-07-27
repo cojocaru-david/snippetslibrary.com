@@ -1,6 +1,17 @@
-name: Version Bump and Release
+name: Auto Version Bump
 
 on:
+  push:
+    branches: [v2]
+    paths-ignore:
+      - "package.json"
+      - "package-lock.json"
+      - ".github/**"
+      - "README.md"
+      - "docker-compose.yml"
+      - "Dockerfile"
+      - "run_db_test.js"
+      - "drizzle.config.ts"
   workflow_dispatch:
     inputs:
       version_type:
@@ -12,25 +23,12 @@ on:
           - patch
           - minor
           - major
-          - prerelease
-      prerelease_id:
-        description: "Prerelease identifier (alpha, beta, rc)"
-        required: false
-        default: "alpha"
-      custom_version:
-        description: "Custom version (overrides version_type)"
-        required: false
 
 jobs:
   version-bump:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
-
-    outputs:
-      new_version: ${{ steps.version.outputs.new_version }}
-      changelog: ${{ steps.changelog.outputs.changelog }}
 
     steps:
       - name: Checkout repository
@@ -57,126 +55,84 @@ jobs:
           echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "Current version: $CURRENT_VERSION"
 
-      - name: Calculate new version
+      - name: Determine version bump type
+        id: bump_type
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            BUMP_TYPE="${{ github.event.inputs.version_type }}"
+          else
+            # Auto bump patch version for regular commits
+            BUMP_TYPE="patch"
+          fi
+          echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+          echo "Version bump type: $BUMP_TYPE"
+
+      - name: Bump version
         id: version
         run: |
-          if [ -n "${{ github.event.inputs.custom_version }}" ]; then
-            NEW_VERSION="${{ github.event.inputs.custom_version }}"
-            echo "Using custom version: $NEW_VERSION"
-          else
-            # Install semver for version calculation
-            npm install -g semver
-            
-            case "${{ github.event.inputs.version_type }}" in
-              "patch")
-                NEW_VERSION=$(semver -i patch ${{ steps.current_version.outputs.current_version }})
-                ;;
-              "minor")
-                NEW_VERSION=$(semver -i minor ${{ steps.current_version.outputs.current_version }})
-                ;;
-              "major")
-                NEW_VERSION=$(semver -i major ${{ steps.current_version.outputs.current_version }})
-                ;;
-              "prerelease")
-                NEW_VERSION=$(semver -i prerelease --preid ${{ github.event.inputs.prerelease_id }} ${{ steps.current_version.outputs.current_version }})
-                ;;
-              *)
-                echo "Invalid version type"
-                exit 1
-                ;;
-            esac
-          fi
-
+          # Use npm version to bump the version
+          NEW_VERSION=$(npm version ${{ steps.bump_type.outputs.bump_type }} --no-git-tag-version)
+          # Remove the 'v' prefix from npm version output
+          NEW_VERSION=${NEW_VERSION#v}
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "New version: $NEW_VERSION"
 
-      - name: Update package.json version
+      - name: Check if version actually changed
+        id: check_changes
         run: |
-          npm version ${{ steps.version.outputs.new_version }} --no-git-tag-version
-          echo "Updated package.json to version ${{ steps.version.outputs.new_version }}"
+          if git diff --quiet package.json; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No version change detected"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Version change detected"
+          fi
+
+      - name: Commit version bump
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
+          git push
+
+      - name: Create Git tag
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git tag -a "v${{ steps.version.outputs.new_version }}" -m "Release v${{ steps.version.outputs.new_version }}"
+          git push origin "v${{ steps.version.outputs.new_version }}"
 
       - name: Generate changelog
+        if: steps.check_changes.outputs.changed == 'true'
         id: changelog
         run: |
           # Create a simple changelog based on commits since last tag
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          LAST_TAG=$(git describe --tags --abbrev=0 --exclude="v${{ steps.version.outputs.new_version }}" 2>/dev/null || echo "")
 
           if [ -z "$LAST_TAG" ]; then
-            echo "No previous tags found, generating changelog from all commits"
-            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --reverse | head -20)
+            echo "No previous tags found, generating changelog from recent commits"
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --max-count=10)
           else
             echo "Generating changelog since last tag: $LAST_TAG"
-            CHANGELOG=$(git log ${LAST_TAG}..HEAD --pretty=format:"- %s (%h)" --reverse)
+            CHANGELOG=$(git log ${LAST_TAG}..HEAD~1 --pretty=format:"- %s (%h)")
           fi
 
-          # Save changelog to output (escape newlines)
+          # Save changelog to output
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Create Pull Request
-        id: create_pr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: bump version to ${{ steps.version.outputs.new_version }}"
-          title: "🔖 Release v${{ steps.version.outputs.new_version }}"
-          body: |
-            ## Release v${{ steps.version.outputs.new_version }}
-
-            This PR bumps the version from `${{ steps.current_version.outputs.current_version }}` to `${{ steps.version.outputs.new_version }}`.
-
-            ### Changes in this release:
-            ${{ steps.changelog.outputs.changelog }}
-
-            ### Type: `${{ github.event.inputs.version_type }}`
-
-            ---
-
-            **Auto-generated by GitHub Actions**
-          branch: release/v${{ steps.version.outputs.new_version }}
-          base: v2
-          delete-branch: true
-          draft: false
-
-      - name: Auto-merge PR if patch version
-        if: github.event.inputs.version_type == 'patch' && steps.create_pr.outputs.pull-request-number
-        run: |
-          sleep 10
-          gh pr merge ${{ steps.create_pr.outputs.pull-request-number }} --squash --auto
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  create-release:
-    needs: version-bump
-    runs-on: ubuntu-latest
-    if: github.event.inputs.version_type != 'prerelease'
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: v2
-
-      - name: Wait for version bump PR to be merged
-        if: github.event.inputs.version_type == 'patch'
-        run: |
-          echo "Waiting for auto-merge to complete..."
-          sleep 60
-
-      - name: Create Release
+      - name: Create GitHub Release
+        if: steps.check_changes.outputs.changed == 'true' && github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ needs.version-bump.outputs.new_version }}
-          name: Release v${{ needs.version-bump.outputs.new_version }}
+          tag_name: v${{ steps.version.outputs.new_version }}
+          name: Release v${{ steps.version.outputs.new_version }}
           body: |
             ## What's Changed
 
-            ${{ needs.version-bump.outputs.changelog }}
+            ${{ steps.changelog.outputs.changelog }}
 
-            **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ steps.current_version.outputs.current_version }}...v${{ needs.version-bump.outputs.new_version }}
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.current_version.outputs.current_version }}...v${{ steps.version.outputs.new_version }}
           draft: false
           prerelease: false
           generate_release_notes: true

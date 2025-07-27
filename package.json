@@ -1,7 +1,25 @@
 {
-  "name": "snippetslibraryv2",
-  "version": "0.1.1",
+  "name": "snippetslibrary.com",
+  "version": "0.1.2",
   "private": true,
+  "description": "A modern, full-stack code snippet manager for developers",
+  "author": "Cojocaru David",
+  "license": "MIT",
+  "homepage": "https://snippetslibrary.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cojocaru-david/snippetslibrary.com"
+  },
+  "keywords": [
+    "snippets",
+    "code",
+    "library",
+    "nextjs",
+    "react",
+    "drizzle",
+    "tailwind",
+    "fullstack"
+  ],
   "scripts": {
     "dev": "prettier --write . && next dev --turbopack --port 3001",
     "build": "next build",
@@ -33,14 +51,12 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
-    "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.3",
     "gsap": "^3.13.0",
     "highlight.js": "^11.11.1",
-    "lang-detector": "^1.0.6",
     "lucide-react": "^0.525.0",
     "next": "15.4.4",
-    "next-auth": "^4.24.11",
+    "next-auth": "^4.24.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.61.1",
@@ -56,13 +72,12 @@
     "@types/node": "^20.19.9",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "drizzle-kit": "^0.31.4",
+    "drizzle-kit": "^0.18.1",
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
     "prettier": "^3.6.2",
     "shiki": "^3.8.1",
     "tailwindcss": "^4",
-    "ts-node": "^10.9.2",
     "tw-animate-css": "^1.3.6",
     "typescript": "^5"
   }

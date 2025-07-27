@@ -1,18 +1,19 @@
-import type { NextAuthOptions } from "next-auth";
-import GithubProvider from "next-auth/providers/github";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { db } from "@/db";
-import { users, accounts, sessions, verificationTokens } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import NextAuth from "next-auth"
+import type { NextAuthConfig } from "next-auth"
+import GithubProvider from "next-auth/providers/github"
+import { DrizzleAdapter } from "@auth/drizzle-adapter"
+import { db } from "@/db"
+import { users, accounts, sessions, verificationTokens } from "@/db/schema"
+import { eq } from "drizzle-orm"
 
 if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) {
-  throw new Error("Missing GitHub OAuth credentials in environment variables.");
+  throw new Error("Missing GitHub OAuth credentials in environment variables.")
 }
-if (!process.env.NEXTAUTH_SECRET) {
-  throw new Error("Missing NEXTAUTH_SECRET");
+if (!process.env.AUTH_SECRET) {
+  throw new Error("Missing AUTH_SECRET")
 }
 
-export const authOptions: NextAuthOptions = {
+export const config = {
   adapter: DrizzleAdapter(db, {
     usersTable: users,
     accountsTable: accounts,
@@ -47,45 +48,45 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/")) {
-        if (url === "/") return `${baseUrl}/dashboard`;
-        return `${baseUrl}${url}`;
+        if (url === "/") return `${baseUrl}/dashboard`
+        return `${baseUrl}${url}`
       } else if (new URL(url).origin === baseUrl) {
-        const urlObj = new URL(url);
-        if (urlObj.pathname === "/") return `${baseUrl}/dashboard`;
-        return url;
+        const urlObj = new URL(url)
+        if (urlObj.pathname === "/") return `${baseUrl}/dashboard`
+        return url
       }
-      return `${baseUrl}/dashboard`;
+      return `${baseUrl}/dashboard`
     },
 
     async jwt({ token, user, account, trigger, session }) {
       if (account) {
-        token.accessToken = account.access_token;
-        token.provider = account.provider;
+        token.accessToken = account.access_token
+        token.provider = account.provider
       }
 
       if (user) {
-        token.id = user.id;
+        token.id = user.id
       }
 
       if (trigger === "update" && session) {
-        token = { ...token, ...session };
+        token = { ...token, ...session }
       }
 
-      return token;
+      return token
     },
 
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id as string;
-        session.accessToken = token.accessToken as string;
-        session.provider = token.provider as string;
+        session.user.id = token.id as string
+        session.accessToken = token.accessToken as string
+        session.provider = token.provider as string
 
         try {
           const userData = await db
             .select()
             .from(users)
             .where(eq(users.id, token.id as string))
-            .limit(1);
+            .limit(1)
           if (userData[0]) {
             session.user.settings = userData[0].settings ?? {
               codeBlockSettings: { theme: "auto" },
@@ -100,14 +101,14 @@ export const authOptions: NextAuthOptions = {
                 notifications: true,
                 analytics: true,
               },
-            };
+            }
           }
         } catch (err) {
-          console.error("Failed to enrich session user:", err);
+          console.error("Failed to enrich session user:", err)
         }
       }
 
-      return session;
+      return session
     },
   },
 
@@ -134,14 +135,15 @@ export const authOptions: NextAuthOptions = {
               },
               updatedAt: new Date(),
             })
-            .where(eq(users.id, user.id));
+            .where(eq(users.id, user.id))
         } catch (err) {
-          console.error("Error setting up new user:", err);
+          console.error("Error setting up new user:", err)
         }
       }
     },
   },
 
-  secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
-};
+} satisfies NextAuthConfig
+
+export const { handlers, auth, signIn, signOut } = NextAuth(config)

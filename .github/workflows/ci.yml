@@ -96,6 +96,10 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             NEXT_TELEMETRY_DISABLED=1
+            DATABASE_URL=postgresql://test:test@localhost:5432/test
+            AUTH_SECRET=test-secret-for-build-min-32-chars
+            GITHUB_CLIENT_ID=test-client-id
+            GITHUB_CLIENT_SECRET=test-client-secret
 
       - name: Test Docker image
         run: |

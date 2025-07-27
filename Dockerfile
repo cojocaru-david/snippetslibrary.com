@@ -31,6 +31,12 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
+# Build-time environment variables (these will be overridden at runtime)
+ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
+ENV AUTH_SECRET="build-time-secret-min-32-chars-long"
+ENV GITHUB_CLIENT_ID="build-client-id"
+ENV GITHUB_CLIENT_SECRET="build-client-secret"
+
 # Build the application
 RUN npm run build
 

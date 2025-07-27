@@ -17,18 +17,19 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "hono": "^4.7.11",
-    "shared": "workspace:*",
-    "drizzle-orm": "^0.36.4",
-     "wrangler": "^4.4.0",
+    "@hono/zod-validator": "^0.4.1",
     "@neondatabase/serverless": "^0.9.5",
-    "drizzle-kit": "^0.30.0",
     "arctic": "^2.3.2",
+    "dotenv": "^16.4.5",
+    "drizzle-kit": "^0.30.0",
+    "drizzle-orm": "^0.36.4",
+    "hono": "^4.7.11",
     "jose": "^5.9.6",
     "nanoid": "^5.0.9",
-    "zod": "^3.24.1",
-    "@hono/zod-validator": "^0.4.1",
-    "dotenv": "^16.4.5"
+    "postgres": "^3.4.7",
+    "shared": "workspace:*",
+    "wrangler": "^4.4.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/bun": "latest"

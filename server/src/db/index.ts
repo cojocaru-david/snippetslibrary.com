@@ -1,13 +1,11 @@
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import { neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import * as schema from './schema';
-
-// Configure Neon for Cloudflare Workers
-neonConfig.fetchConnectionCache = true;
 
 // Create database connection function that creates a fresh connection each time
 export function createDb() {
-  return drizzle(process.env.DATABASE_URL!, { schema });
+  const client = postgres(process.env.DATABASE_URL!);
+  return drizzle(client, { schema });
 }
 
 // For compatibility, also export db but recommend using createDb() in handlers

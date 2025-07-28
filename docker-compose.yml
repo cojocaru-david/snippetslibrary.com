@@ -60,7 +60,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: ["bash", "-c", "cd /usr/local/app/server && bun run db:migrate"]
+
+    command: ["bash", "-c", "cd /usr/local/app/server && bun src/migrate.ts"]
     restart: "no"
 
   db:

@@ -24,8 +24,9 @@ export default function Header() {
           const data = await response.json();
           setSnippetsCount(data.pagination?.total || 0);
         }
-      } catch (error) {
-        console.error("Failed to fetch snippets count:", error);
+      } catch {
+        // eslint-disable-next-line no-console
+        console.error("Failed to fetch snippets count");
       }
     };
 

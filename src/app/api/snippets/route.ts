@@ -78,8 +78,7 @@ export async function GET(request: NextRequest) {
         totalPages: Math.ceil(totalCount / limit),
       },
     });
-  } catch (error) {
-    console.error("Error fetching snippets:", error);
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch snippets" },
       { status: 500 },
@@ -118,7 +117,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error("Error creating snippet:", error);
     return NextResponse.json(
       { error: "Failed to create snippet" },
       { status: 500 },

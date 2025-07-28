@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import {
   Share2,
@@ -47,7 +49,6 @@ export function ShareDialog({
       setShareId(newShareId);
       toast.success("Share link generated successfully!");
     } catch (error) {
-      console.error("Generate share link error:", error);
       const message =
         error instanceof Error
           ? error.message
@@ -68,7 +69,6 @@ export function ShareDialog({
       toast.success("Link copied to clipboard!");
       setTimeout(() => setCopied(false), 3000);
     } catch (error) {
-      console.error("Copy error:", error);
       toast.error(
         error instanceof Error ? error.message : "Failed to copy link",
       );
@@ -105,7 +105,6 @@ export function ShareDialog({
       setShareId(null);
       toast.success("Share link revoked successfully!");
     } catch (error) {
-      console.error("Revoke error:", error);
       toast.error(
         error instanceof Error ? error.message : "Failed to revoke share link",
       );

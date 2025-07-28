@@ -118,11 +118,26 @@ export const CodeBlock = memo<CodeBlockProps>(
       fg: "#24292f",
     });
     const [isInView, setIsInView] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
     const mountedRef = useRef(true);
     const highlightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const observerRef = useRef<IntersectionObserver | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+
+    // Check if code is large enough to trigger fallback
+    const sanitizedCode = useMemo(() => {
+      if (!code) return "";
+      return sanitizeText(code);
+    }, [code]);
+
+    const isLargeCode = useMemo(() => {
+      return sanitizedCode.length > 150000;
+    }, [sanitizedCode]);
+
+    useEffect(() => {
+      setIsMounted(true);
+    }, []);
 
     useEffect(() => {
       if (!containerRef.current || typeof window === "undefined") return;
@@ -157,11 +172,6 @@ export const CodeBlock = memo<CodeBlockProps>(
         observerRef.current?.disconnect();
       };
     }, []);
-
-    const sanitizedCode = useMemo(() => {
-      if (!code) return "";
-      return sanitizeText(code);
-    }, [code]);
 
     const normalizedLanguage = useMemo(() => {
       if (!language) return "text";
@@ -202,7 +212,7 @@ export const CodeBlock = memo<CodeBlockProps>(
     );
 
     const highlightCode = useCallback(async () => {
-      if (!mountedRef.current || !isInView) return;
+      if (!mountedRef.current || !isInView || !isMounted) return;
 
       if (!sanitizedCode.trim()) {
         setHighlightedCode("");
@@ -246,18 +256,13 @@ export const CodeBlock = memo<CodeBlockProps>(
           if (mountedRef.current) {
             setThemeColors(colors);
           }
-        } catch (colorError) {
-          console.warn(
-            "Failed to get theme colors, using defaults:",
-            colorError,
-          );
+        } catch {
           if (mountedRef.current) {
             setThemeColors(getDefaultColors(effectiveHighlightTheme));
           }
         }
       } catch (err) {
         if (mountedRef.current) {
-          console.error("Code highlighting failed:", err);
           setError(
             err instanceof Error ? err : new Error("Highlighting failed"),
           );
@@ -274,10 +279,11 @@ export const CodeBlock = memo<CodeBlockProps>(
       effectiveHighlightTheme,
       getDefaultColors,
       isInView,
+      isMounted,
     ]);
 
     useEffect(() => {
-      if (!isInView) return;
+      if (!isInView || !isMounted) return;
 
       if (highlightTimeoutRef.current) {
         clearTimeout(highlightTimeoutRef.current);
@@ -292,14 +298,13 @@ export const CodeBlock = memo<CodeBlockProps>(
           clearTimeout(highlightTimeoutRef.current);
         }
       };
-    }, [highlightCode, isInView]);
+    }, [highlightCode, isInView, isMounted]);
 
     const handleCopy = useCallback(async () => {
       try {
         await navigator.clipboard.writeText(sanitizedCode);
         toast.success("Code copied to clipboard!");
-      } catch (err) {
-        console.error("Failed to copy:", err);
+      } catch {
         toast.error("Failed to copy code");
       }
     }, [sanitizedCode]);
@@ -318,8 +323,7 @@ export const CodeBlock = memo<CodeBlockProps>(
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         toast.success("Code downloaded!");
-      } catch (err) {
-        console.error("Failed to download:", err);
+      } catch {
         toast.error("Failed to download code");
       }
     }, [sanitizedCode, filename, normalizedLanguage]);
@@ -341,6 +345,9 @@ export const CodeBlock = memo<CodeBlockProps>(
     const hasHeader = Boolean(
       title || showCopyButton || showDownloadButton || showExpandButton,
     );
+
+    // For large code snippets, always show the fallback to prevent hydration mismatches
+    const shouldShowFallback = isLargeCode || (!isMounted && isLargeCode);
 
     return (
       <Card
@@ -405,10 +412,17 @@ export const CodeBlock = memo<CodeBlockProps>(
         )}
 
         <div
-          className={`border border-border font-mono text-sm transition-all duration-200 relative border-none rounded-b-lg`}
+          className="border border-border font-mono text-sm transition-all duration-200 relative border-none rounded-b-lg"
           style={containerStyle}
         >
-          {isLoading && !highlightedCode ? (
+          {shouldShowFallback ? (
+            // For large code snippets, always use fallback to prevent hydration mismatch
+            <div suppressHydrationWarning>
+              <pre className="whitespace-pre-wrap p-4 m-0 overflow-auto font-mono text-sm leading-relaxed max-w-full">
+                <code>{children || sanitizedCode}</code>
+              </pre>
+            </div>
+          ) : isLoading && !highlightedCode ? (
             <div className="flex items-center justify-center p-8">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="w-4 h-4 animate-spin" />

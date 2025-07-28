@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, memo, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useSettings } from "@/contexts/SettingsContext";
 import {
@@ -13,7 +13,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +24,6 @@ import {
   Sun,
   Moon,
   Save,
-  Check,
   AlertCircle,
   Loader2,
 } from "lucide-react";
@@ -35,57 +33,8 @@ import {
   LazyCodeBlock,
   LazyCombobox,
 } from "@/components/dashboard/LazyComponents";
-
-const ThemeButton = memo<{
-  value: "light" | "dark" | "auto";
-  label: string;
-  icon: typeof Sun;
-  selected: boolean;
-  onClick: () => void;
-}>(function ThemeButton({ label, icon: Icon, selected, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`relative p-4 rounded-lg border-2 transition-all ${
-        selected
-          ? "border-primary bg-primary/5"
-          : "border-border hover:border-primary/50"
-      }`}
-    >
-      <div className="flex flex-col items-center gap-2">
-        <Icon className="w-5 h-5" />
-        <span className="text-sm font-medium">{label}</span>
-      </div>
-      {selected && (
-        <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
-      )}
-    </button>
-  );
-});
-
-const PreferenceToggle = memo<{
-  title: string;
-  description: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}>(function PreferenceToggle({ title, description, checked, onChange }) {
-  const handleChange = useCallback(
-    (value: boolean) => {
-      onChange(value);
-    },
-    [onChange],
-  );
-
-  return (
-    <div className="flex items-center justify-between py-3">
-      <div className="space-y-1">
-        <Label className="text-sm font-medium">{title}</Label>
-        <p className="text-xs text-muted-foreground">{description}</p>
-      </div>
-      <Switch checked={checked} onCheckedChange={handleChange} />
-    </div>
-  );
-});
+import ThemeButton from "@/components/dashboard/settings/ThemeButton";
+import PreferenceToggle from "@/components/dashboard/settings/PreferenceToggle";
 
 export default function SettingsPage() {
   const { status } = useSession();
@@ -261,7 +210,10 @@ export default function SettingsPage() {
       .then(({ getAllThemes }) => {
         setThemeList(getAllThemes());
       })
-      .catch(console.warn);
+      .catch(() => {
+        // eslint-disable-next-line no-console
+        console.error("Failed to load themes");
+      });
   }, []);
 
   if (status === "loading" || loading) {

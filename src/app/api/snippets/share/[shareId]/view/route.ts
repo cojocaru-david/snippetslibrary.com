@@ -10,7 +10,6 @@ export async function POST(
 ) {
   try {
     const { shareId } = await params;
-    console.log("View tracking request for shareId:", shareId);
     // Find the snippet first
     const snippet = await db
       .select({ id: snippets.id, userId: snippets.userId })
@@ -44,7 +43,6 @@ export async function POST(
     // Check if this is the snippet owner
     if (session?.user?.id === foundSnippet.userId) {
       // Don't count views from the snippet owner
-      console.log("View not tracked: snippet owner");
       return NextResponse.json({ tracked: false, reason: "owner" });
     }
 
@@ -83,7 +81,6 @@ export async function POST(
     }
 
     if (!shouldTrack) {
-      console.log("View not tracked: duplicate view detected");
       return NextResponse.json({ tracked: false, reason: "duplicate" });
     }
 
@@ -102,10 +99,8 @@ export async function POST(
       })
       .where(eq(snippets.id, foundSnippet.id));
 
-    console.log("View tracked successfully");
     return NextResponse.json({ tracked: true });
-  } catch (error) {
-    console.error("Error tracking view:", error);
+  } catch {
     return NextResponse.json(
       { error: "Failed to track view" },
       { status: 500 },

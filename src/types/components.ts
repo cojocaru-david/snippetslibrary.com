@@ -16,7 +16,7 @@ export const snippetSchema = z.object({
   code: z
     .string()
     .min(1, "Code is required")
-    .max(50000, "Code must be less than 50,000 characters")
+    .max(200000, "Code must be less than 200,000 characters")
     .refine((val) => val.trim().length > 0, "Code cannot be empty"),
   language: z.string().min(1, "Language is required"),
   tags: z.string().max(500, "Tags must be less than 500 characters").optional(),
@@ -128,10 +128,4 @@ export interface SearchBarProps {
   onSearchChange: (value: string) => void;
   onCreateSnippet: () => void;
   children?: React.ReactNode; // For filters component
-}
-
-export interface EmptyStateProps {
-  hasActiveFilters: boolean;
-  onCreateSnippet: () => void;
-  onClearAllFilters: () => void;
 }

@@ -67,62 +67,16 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-    ];
-  },
-
-  // Webpack optimizations
-  webpack(config, { isServer, dev }) {
-    // Client-side fallbacks
-    if (!isServer) {
-      config.resolve.fallback = {
-        fs: false,
-        path: false,
-        crypto: false,
-      };
-    }
-
-    // Production optimizations
-    if (!dev) {
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: "all",
-          cacheGroups: {
-            default: {
-              minChunks: 2,
-              priority: -20,
-              reuseExistingChunk: true,
-            },
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: "vendors",
-              priority: -10,
-              chunks: "all",
-            },
-            shiki: {
-              test: /[\\/]node_modules[\\/]shiki[\\/]/,
-              name: "shiki",
-              priority: 10,
-              chunks: "async",
-            },
-            radix: {
-              test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
-              name: "radix-ui",
-              priority: 5,
-              chunks: "all",
-            },
-            lucide: {
-              test: /[\\/]node_modules[\\/]lucide-react[\\/]/,
-              name: "lucide",
-              priority: 5,
-              chunks: "all",
-            },
+      {
+        source: "/api/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store",
           },
-        },
-      };
-    }
-
-    return config;
+        ],
+      },
+    ];
   },
 };
 

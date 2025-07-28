@@ -77,8 +77,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     );
 
     return allRoutes;
-  } catch (error) {
-    console.error("Error generating sitemap:", error);
+  } catch {
+    // eslint-disable-next-line no-console
+    console.error("Error generating sitemap");
 
     return staticRoutes;
   }

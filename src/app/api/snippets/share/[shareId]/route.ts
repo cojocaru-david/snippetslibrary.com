@@ -40,8 +40,7 @@ export async function GET(
     const foundSnippet = snippet[0];
 
     return NextResponse.json(foundSnippet);
-  } catch (error) {
-    console.error("Error fetching shared snippet:", error);
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch snippet" },
       { status: 500 },
@@ -91,8 +90,7 @@ export async function POST(
       .returning();
 
     return NextResponse.json(newSnippet[0], { status: 201 });
-  } catch (error) {
-    console.error("Error copying snippet:", error);
+  } catch {
     return NextResponse.json(
       { error: "Failed to copy snippet" },
       { status: 500 },

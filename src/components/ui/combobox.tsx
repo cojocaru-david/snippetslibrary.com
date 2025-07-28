@@ -69,6 +69,7 @@ export function Combobox({
 
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
+  const listRef = React.useRef<HTMLDivElement>(null);
 
   const selectedOption = React.useMemo(() => {
     if (multiple) {
@@ -147,6 +148,24 @@ export function Combobox({
     }
   }, []);
 
+  // Fix scroll handling
+  const handleWheel = React.useCallback((e: React.WheelEvent) => {
+    // Prevent the event from bubbling up and allow natural scrolling
+    e.stopPropagation();
+
+    const listElement = listRef.current;
+    if (listElement) {
+      // Allow natural scrolling within the list
+      const { scrollTop, scrollHeight, clientHeight } = listElement;
+      const atTop = scrollTop === 0;
+      const atBottom = scrollTop + clientHeight >= scrollHeight;
+
+      if ((atTop && e.deltaY < 0) || (atBottom && e.deltaY > 0)) {
+        return;
+      }
+    }
+  }, []);
+
   const displayText = React.useMemo(() => {
     if (multiple) {
       if (values.length === 0) return placeholder;
@@ -199,7 +218,9 @@ export function Combobox({
           className="w-full p-0"
           align="start"
           onKeyDown={handleKeyDown}
-          style={{ width: triggerRef.current?.offsetWidth }}
+          style={{
+            width: triggerRef.current?.offsetWidth || "auto",
+          }}
         >
           <Command shouldFilter={false}>
             <CommandInput
@@ -208,11 +229,17 @@ export function Combobox({
               onValueChange={setSearchValue}
             />
             <CommandList
-              className="overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+              ref={listRef}
+              className="overflow-y-auto overflow-x-hidden scroll-smooth"
               style={{
                 maxHeight: `${maxHeight}px`,
                 overscrollBehavior: "contain",
+                touchAction: "pan-y",
+                scrollbarWidth: "thin",
               }}
+              onWheel={handleWheel}
+              data-scroll="true"
+              tabIndex={-1}
             >
               {loading ? (
                 <div className="py-6 text-center text-sm text-muted-foreground">

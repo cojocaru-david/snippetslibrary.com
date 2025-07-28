@@ -17,8 +17,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       language: detected.language || "plaintext",
     });
-  } catch (error) {
-    console.error("Language detection error:", error);
+  } catch {
     return NextResponse.json(
       { error: "Failed to detect language" },
       { status: 500 },

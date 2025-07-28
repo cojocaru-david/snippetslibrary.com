@@ -21,8 +21,7 @@ export async function GET() {
     }
 
     return NextResponse.json(settings);
-  } catch (error) {
-    console.error("Error fetching settings:", error);
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -89,8 +88,7 @@ export async function PATCH(request: NextRequest) {
 
     const updatedSettings = await getUserSettings(session.user.id);
     return NextResponse.json(updatedSettings);
-  } catch (error) {
-    console.error("Error updating settings:", error);
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

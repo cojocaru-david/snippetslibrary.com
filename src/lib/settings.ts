@@ -67,8 +67,7 @@ export async function updateUserSettings(
       .where(eq(users.id, userId));
 
     return true;
-  } catch (error) {
-    console.error("Error updating user settings:", error);
+  } catch {
     return false;
   }
 }

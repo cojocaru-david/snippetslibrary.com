@@ -11,6 +11,23 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    rules: {
+      "no-console": "warn",
+      "react/jsx-curly-brace-presence": [
+        "error",
+        { props: "never", children: "never" },
+      ],
+      "@next/next/no-img-element": "off",
+    },
+  },
+  {
+    files: ["**/*.js"],
+    rules: {
+      "no-var": "error",
+    },
+  },
 ];
 
 export default eslintConfig;

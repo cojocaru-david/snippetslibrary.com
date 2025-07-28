@@ -5,8 +5,8 @@ import { db } from "@/db";
 import { snippets, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { generateOGImageUrl } from "@/lib/utils";
-import ShareSnippetClient from "./ShareSnippetClient";
 import type { SharedSnippet, SEOSettings, PageProps } from "@/types";
+import ShareSnippetClient from "@/components/ShareSnippetClient";
 
 async function getSnippetData(shareId: string): Promise<{
   snippet: SharedSnippet | null;
@@ -83,8 +83,7 @@ async function getSnippetData(shareId: string): Promise<{
         ?.theme as string) || "github-dark";
 
     return { snippet, seoSettings, ownerHighlightTheme };
-  } catch (error) {
-    console.error("Error fetching snippet data:", error);
+  } catch {
     return { snippet: null, seoSettings: null };
   }
 }

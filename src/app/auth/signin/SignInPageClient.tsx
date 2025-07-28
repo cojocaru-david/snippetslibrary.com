@@ -8,6 +8,7 @@ import { useState } from "react";
 import PageIllustration from "@/components/landing/PageIllustration";
 import Logo from "@/components/custom/logo";
 import { useAuth } from "@/contexts/AuthContext";
+import toast from "react-hot-toast";
 
 function SignInContent() {
   const router = useRouter();
@@ -46,8 +47,8 @@ function SignInContent() {
     setLoading(true);
     try {
       await signIn("github", { callbackUrl });
-    } catch (error) {
-      console.error("Sign in error:", error);
+    } catch {
+      toast.error("Failed to sign in");
     } finally {
       setLoading(false);
     }

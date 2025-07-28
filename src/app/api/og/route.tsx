@@ -470,7 +470,6 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (e: unknown) {
-    console.error("OG image generation failed:", e);
     return new Response(
       `Failed to generate the image: ${e instanceof Error ? e.message : "Unknown error"}`,
       {

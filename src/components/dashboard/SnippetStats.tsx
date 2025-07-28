@@ -3,6 +3,14 @@ import { Code, Search } from "lucide-react";
 import type { SnippetStatsProps } from "@/types";
 
 export function SnippetStats({ pagination, searchTerm }: SnippetStatsProps) {
+  if (!pagination) {
+    return null;
+  }
+
+  if (pagination.total === 0) {
+    return null;
+  }
+
   return (
     <div className="flex items-center justify-between text-sm text-muted-foreground">
       <div className="flex items-center gap-4">

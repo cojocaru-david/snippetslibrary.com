@@ -47,8 +47,7 @@ export async function GET() {
         "react",
       ],
     });
-  } catch (error) {
-    console.error("Error fetching public SEO settings:", error);
+  } catch {
 
     return NextResponse.json({
       title: "Amazing Code Snippets",

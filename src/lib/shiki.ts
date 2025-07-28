@@ -220,12 +220,7 @@ class ShikiService {
 
       CORE_THEMES.forEach((theme) => this.loadedThemes.add(theme));
       CORE_LANGUAGES.forEach((lang) => this.loadedLanguages.add(lang));
-
-      console.log(
-        "Shiki highlighter initialized with core themes and languages",
-      );
     } catch (error) {
-      console.error("Failed to initialize Shiki highlighter:", error);
       throw error;
     } finally {
       this.isInitializing = false;
@@ -241,8 +236,7 @@ class ShikiService {
       return "<pre><code></code></pre>";
     }
 
-    if (code.length > 30000) {
-      console.warn("Code is very long, using fallback highlighting");
+    if (code.length > 150000) {
       return this.createFallbackHighlight(code, language);
     }
 
@@ -287,8 +281,7 @@ class ShikiService {
       this.cache.set(cacheKey, result, finalLanguage, finalTheme);
 
       return result;
-    } catch (error) {
-      console.error("Failed to highlight code:", error);
+    } catch {
       return this.createFallbackHighlight(code, language);
     }
   }
@@ -314,8 +307,7 @@ class ShikiService {
         this.getDefaultForegroundColor(finalTheme);
 
       return { bg, fg };
-    } catch (error) {
-      console.warn("Failed to get theme colors:", error);
+    } catch {
       return this.getDefaultThemeColors(theme);
     }
   }
@@ -350,6 +342,7 @@ class ShikiService {
       await highlighter.loadLanguage(language);
       this.loadedLanguages.add(language);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.warn(`Failed to load language '${language}':`, error);
     }
   }
@@ -384,6 +377,7 @@ class ShikiService {
       await highlighter.loadTheme(theme);
       this.loadedThemes.add(theme);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.warn(`Failed to load theme '${theme}':`, error);
     }
   }
@@ -595,15 +589,14 @@ class ShikiService {
       );
 
       await Promise.allSettled([...themePromises, ...langPromises]);
+    } catch {
+      // eslint-disable-next-line no-console
       console.log("Critical themes and languages preloaded");
-    } catch (error) {
-      console.warn("Failed to preload popular themes and languages:", error);
     }
   }
 
   clearCache(): void {
     this.cache.clear();
-    console.log("Shiki cache cleared");
   }
 
   getCacheStats(): { size: number; maxSize: number; hitRate?: number } {
@@ -873,12 +866,14 @@ if (typeof window !== "undefined") {
     if ("requestIdleCallback" in window) {
       window.requestIdleCallback(
         () => {
+          // eslint-disable-next-line no-console
           shikiService.preloadPopular().catch(console.warn);
         },
         { timeout: 5000 },
       );
     } else {
       setTimeout(() => {
+        // eslint-disable-next-line no-console
         shikiService.preloadPopular().catch(console.warn);
       }, 3000);
     }

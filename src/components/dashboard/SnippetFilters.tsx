@@ -26,6 +26,10 @@ export function SnippetFilters({
   activeFiltersCount,
   onClearAllFilters,
 }: SnippetFiltersProps) {
+  if (!showFilters) {
+    return null;
+  }
+
   const handleTagSelect = (value: string) => {
     if (value && !selectedTags.includes(value)) {
       setSelectedTags([...selectedTags, value]);
@@ -41,7 +45,6 @@ export function SnippetFilters({
       <Button
         variant={showFilters ? "default" : "outline"}
         onClick={() => setShowFilters(!showFilters)}
-        className="h-12 px-4"
       >
         <Filter className="h-4 w-4 mr-2" />
         Filters

@@ -92,7 +92,7 @@ jobs:
         if: steps.check_changes.outputs.changed == 'true'
         run: |
           git add package.json package-lock.json
-          git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
+          git commit -m "🔧 chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
           git push
 
       - name: Create Git tag

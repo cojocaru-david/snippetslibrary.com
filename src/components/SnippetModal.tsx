@@ -39,6 +39,7 @@ import { getAllLanguages } from "@/lib/shiki";
 import toast from "react-hot-toast";
 import type { SnippetFormData, SnippetModalProps } from "@/types";
 import { snippetSchema } from "@/types";
+import detectLanguage from "@/lib/detect-lang";
 
 const ALL_LANGUAGE_OPTIONS = getAllLanguages();
 const ALL_LANGUAGES = ALL_LANGUAGE_OPTIONS.map((lang) => lang.value);
@@ -48,6 +49,11 @@ const detectLanguageAPI = async (
   filename?: string,
 ): Promise<string> => {
   try {
+    const detectedFallback = await detectLanguage(code);
+    if (detectedFallback != "text") {
+      return detectedFallback;
+    }
+
     const response = await fetch("/api/detect-language", {
       method: "POST",
       headers: {
@@ -64,33 +70,8 @@ const detectLanguageAPI = async (
     return result.language || "javascript";
   } catch (error) {
     console.warn("Language detection API failed:", error);
-    return detectLanguageFallback(code);
+    return detectLanguage(code);
   }
-};
-
-const detectLanguageFallback = (code: string): string => {
-  if (!code || code.trim().length < 10) return "javascript";
-
-  const sample = code.slice(0, 200).toLowerCase();
-
-  if (sample.includes("<!doctype") || sample.includes("<html")) return "html";
-  if (sample.includes("<?php")) return "php";
-  if (sample.startsWith("#!/bin/bash")) return "bash";
-  if (sample.includes("package main") && sample.includes("func main"))
-    return "go";
-  if (sample.includes("def ") && sample.includes("import ")) return "python";
-  if (sample.includes("public class") || sample.includes("import java"))
-    return "java";
-  if (sample.includes("interface ") && sample.includes("type "))
-    return "typescript";
-  if (
-    sample.includes("function ") ||
-    sample.includes("const ") ||
-    sample.includes("=>")
-  )
-    return "javascript";
-
-  return "text";
 };
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -119,6 +100,7 @@ export function SnippetModal({
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [hasManuallySelectedLanguage, setHasManuallySelectedLanguage] =
     useState(false);
+  const [lastDetectedCode, setLastDetectedCode] = useState("");
 
   const {
     register,
@@ -141,7 +123,7 @@ export function SnippetModal({
   });
 
   const watchedValues = watch();
-  const debouncedCode = useDebounce(watchedValues.code, 2000);
+  const debouncedCode = useDebounce(watchedValues.code, 1000); // Changed to 1 second
 
   const codeLength = useMemo(
     () => watchedValues.code?.length || 0,
@@ -165,6 +147,7 @@ export function SnippetModal({
       };
       reset(values);
       setHasManuallySelectedLanguage(!!snippet.language);
+      setLastDetectedCode(snippet.code || "");
 
       if (snippet.shareId && snippet.isPublic) {
         setShareUrl(`${window.location.origin}/share/${snippet.shareId}`);
@@ -180,54 +163,69 @@ export function SnippetModal({
     }
   }, [watchedValues.isPublic, snippet?.shareId]);
 
-  const handleManualDetection = useCallback(async () => {
-    if (!watchedValues.code) return;
+  const performLanguageDetection = useCallback(
+    async (code: string, isManual: boolean = false) => {
+      if (!code || code.trim().length < 10) return;
 
-    setIsDetectingLanguage(true);
-
-    try {
-      const detected = await detectLanguageAPI(watchedValues.code);
-      if (
-        detected &&
-        detected !== watchedValues.language &&
-        ALL_LANGUAGES.includes(detected)
-      ) {
-        setValue("language", detected);
-        setHasManuallySelectedLanguage(true);
-        toast.success(`Language detected: ${detected}`, { duration: 2000 });
+      if (isManual) {
+        setIsDetectingLanguage(true);
       }
-    } catch (error) {
-      console.warn("Manual language detection failed:", error);
-      toast.error("Failed to detect language");
-    } finally {
-      setIsDetectingLanguage(false);
-    }
-  }, [watchedValues.code, watchedValues.language, setValue]);
 
+      try {
+        const detected = await detectLanguageAPI(code);
+
+        if (
+          detected &&
+          detected !== watchedValues.language &&
+          ALL_LANGUAGES.includes(detected)
+        ) {
+          setValue("language", detected);
+          setLastDetectedCode(code);
+
+          if (isManual) {
+            setHasManuallySelectedLanguage(true);
+          } else {
+            setHasManuallySelectedLanguage(false);
+          }
+        }
+      } catch (error) {
+        console.warn("Language detection failed:", error);
+        if (isManual) {
+          toast.error("Failed to detect language");
+        }
+      } finally {
+        if (isManual) {
+          setIsDetectingLanguage(false);
+        }
+      }
+    },
+    [watchedValues.language, setValue],
+  );
+
+  const handleManualDetection = useCallback(async () => {
+    if (!watchedValues.code) {
+      toast.error("Please enter some code first");
+      return;
+    }
+
+    await performLanguageDetection(watchedValues.code, true);
+  }, [watchedValues.code, performLanguageDetection]);
+
+  // Auto-detection effect with improved logic
   useEffect(() => {
     if (
       debouncedCode &&
-      debouncedCode.length > 50 &&
-      !hasManuallySelectedLanguage &&
-      (!watchedValues.language || watchedValues.language === "javascript")
+      debouncedCode.trim().length > 20 && // Increased minimum length
+      debouncedCode !== lastDetectedCode && // Only detect if code has changed significantly
+      !hasManuallySelectedLanguage // Don't auto-detect if user manually selected
     ) {
-      detectLanguageAPI(debouncedCode)
-        .then((detected) => {
-          if (
-            detected !== watchedValues.language &&
-            detected !== "text" &&
-            ALL_LANGUAGES.includes(detected)
-          ) {
-            setValue("language", detected);
-          }
-        })
-        .catch(console.warn);
+      performLanguageDetection(debouncedCode, false);
     }
   }, [
     debouncedCode,
-    setValue,
-    watchedValues.language,
+    lastDetectedCode,
     hasManuallySelectedLanguage,
+    performLanguageDetection,
   ]);
 
   const handleClose = useCallback(() => {
@@ -235,6 +233,8 @@ export function SnippetModal({
     setShareUrl("");
     setViewMode("edit");
     setHasManuallySelectedLanguage(false);
+    setLastDetectedCode("");
+    setIsDetectingLanguage(false);
     onClose();
   }, [reset, onClose]);
 
@@ -351,6 +351,15 @@ export function SnippetModal({
       throw error;
     }
   };
+
+  // Handle language selection changes
+  const handleLanguageChange = useCallback(
+    (language: string) => {
+      setValue("language", language);
+      setHasManuallySelectedLanguage(true);
+    },
+    [setValue],
+  );
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -500,10 +509,7 @@ export function SnippetModal({
               <Combobox
                 options={ALL_LANGUAGE_OPTIONS}
                 value={watchedValues.language}
-                onValueChange={(value) => {
-                  setValue("language", value);
-                  setHasManuallySelectedLanguage(true);
-                }}
+                onValueChange={handleLanguageChange}
                 placeholder="Select programming language"
                 searchPlaceholder="Search languages..."
                 emptyText="No language found."
@@ -538,7 +544,7 @@ export function SnippetModal({
                 >
                   Code *
                   <span className="text-xs text-muted-foreground">
-                    ({codeLength.toLocaleString()}/50,000)
+                    ({codeLength.toLocaleString()}/200,000)
                   </span>
                 </Label>
                 {!isViewMode &&
@@ -675,8 +681,8 @@ export function SnippetModal({
                     <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
                       Ctrl+S
                     </kbd>{" "}
-                    to save •
-                    <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs mx-1">
+                    to save •{" "}
+                    <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
                       Esc
                     </kbd>{" "}
                     to close

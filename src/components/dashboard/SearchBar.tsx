@@ -18,7 +18,7 @@ export function SearchBar({
           placeholder="Search snippets by title, description, or tags..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10 h-12 text-base bg-card border-border focus:ring-2 focus:ring-primary/20 transition-all"
+          className="pl-10 h-10 text-base bg-card border-border focus:ring-2 focus:ring-primary/20 transition-all"
         />
         {searchTerm && (
           <Button
@@ -37,7 +37,7 @@ export function SearchBar({
 
         <Button
           onClick={onCreateSnippet}
-          className="h-12 px-6 bg-primary hover:bg-primary/90 shadow-sm"
+          className="bg-primary hover:bg-primary/90 shadow-sm"
         >
           <Plus className="h-4 w-4 mr-2" />
           New Snippet

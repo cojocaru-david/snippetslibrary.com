@@ -16,12 +16,13 @@ import {
   SnippetFilters,
   SnippetStats,
   SnippetGrid,
-  EmptyState,
   SearchBar,
   LazyPagination,
 } from "@/components/dashboard";
 import type { Snippet, PaginationInfo } from "@/types";
 import { SnippetModal } from "@/components/SnippetModal";
+import { Code, Plus, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -89,9 +90,11 @@ export default function DashboardPage() {
 
       const data = await response.json();
       setSnippets(data.snippets);
+      if (!data.snippets) {
+        setShowFilters(false);
+      }
       setPagination(data.pagination);
-    } catch (error) {
-      console.error("Error fetching snippets:", error);
+    } catch {
       toast.error("Failed to load snippets");
     } finally {
       setLoading(false);
@@ -156,8 +159,7 @@ export default function DashboardPage() {
         toast.success("Snippet deleted successfully");
         fetchSnippets();
         window.dispatchEvent(new CustomEvent("snippetUpdated"));
-      } catch (error) {
-        console.error("Error deleting snippet:", error);
+      } catch {
         toast.error("Failed to delete snippet");
       }
     },
@@ -196,15 +198,6 @@ export default function DashboardPage() {
     setSelectedTags([]);
   }, []);
 
-  const hasActiveFilters = useMemo(
-    () =>
-      !!debouncedSearchTerm ||
-      selectedLanguage !== "all" ||
-      selectedVisibility !== "all" ||
-      selectedTags.length > 0,
-    [debouncedSearchTerm, selectedLanguage, selectedVisibility, selectedTags],
-  );
-
   const activeFiltersCount = useMemo(
     () =>
       (selectedLanguage !== "all" ? 1 : 0) +
@@ -222,7 +215,7 @@ export default function DashboardPage() {
           text={[
             "Welcome back, " + user?.name + "! 👋",
             "Ready to code something amazing?",
-            "You have " + snippets.length + " snippets in your library.",
+            "You have " + pagination.total + " snippets in your library.",
           ]}
           typingSpeed={100}
           pauseDuration={4000}
@@ -264,22 +257,48 @@ export default function DashboardPage() {
       </div>
 
       {/* Snippets Grid */}
-      {snippets.length === 0 ? (
-        <EmptyState
-          hasActiveFilters={hasActiveFilters}
-          onCreateSnippet={handleCreateSnippet}
-          onClearAllFilters={clearAllFilters}
-        />
-      ) : (
-        <SnippetGrid
-          snippets={snippets}
-          loading={loading}
-          onEdit={handleEditSnippet}
-          onDelete={handleDeleteSnippet}
-          onCopyShareUrl={handleCopyShareUrl}
-          onOpenShareUrl={openShareUrl}
-          userSettings={user?.settings}
-        />
+      <SnippetGrid
+        snippets={snippets}
+        loading={loading}
+        onEdit={handleEditSnippet}
+        onDelete={handleDeleteSnippet}
+        onCopyShareUrl={handleCopyShareUrl}
+        onOpenShareUrl={openShareUrl}
+        userSettings={user?.settings}
+      />
+
+      {!loading && snippets.length === 0 && (
+        <div className="text-center py-20">
+          <div className="bg-muted/30 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+            <Code className="w-12 h-12 text-muted-foreground" />
+          </div>
+          <h3 className="text-2xl font-semibold text-foreground mb-3">
+            {activeFiltersCount > 0 ? "No snippets found" : "No snippets yet"}
+          </h3>
+          <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+            {activeFiltersCount > 0
+              ? "Try adjusting your filters or search terms to find what you're looking for."
+              : "Start building your personal code library by creating your first snippet. Organize, share, and reuse your code effortlessly."}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              onClick={handleCreateSnippet}
+              size="lg"
+              className="bg-primary hover:bg-primary/90"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              {activeFiltersCount > 0
+                ? "Create New Snippet"
+                : "Create Your First Snippet"}
+            </Button>
+            {activeFiltersCount > 0 && (
+              <Button variant="outline" size="lg" onClick={clearAllFilters}>
+                <X className="w-4 h-4 mr-2" />
+                Clear All Filters
+              </Button>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Pagination */}

@@ -92,9 +92,8 @@ export default function LandingPageClient() {
     try {
       setIsLoading(true);
       await signIn("github");
-    } catch (error) {
+    } catch {
       toast.error("Failed to login. Please try again.");
-      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }

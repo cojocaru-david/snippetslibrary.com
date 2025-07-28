@@ -30,8 +30,7 @@ export async function GET(
     }
 
     return NextResponse.json(snippet[0]);
-  } catch (error) {
-    console.error("Error fetching snippet:", error);
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch snippet" },
       { status: 500 },
@@ -93,7 +92,6 @@ export async function PUT(
       );
     }
 
-    console.error("Error updating snippet:", error);
     return NextResponse.json(
       { error: "Failed to update snippet" },
       { status: 500 },
@@ -127,8 +125,7 @@ export async function DELETE(
     await db.delete(snippets).where(eq(snippets.id, id));
 
     return NextResponse.json({ message: "Snippet deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting snippet:", error);
+  } catch {
     return NextResponse.json(
       { error: "Failed to delete snippet" },
       { status: 500 },

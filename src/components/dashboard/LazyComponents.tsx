@@ -28,7 +28,6 @@ export const LazyCodeBlock = dynamic(
     })),
   {
     loading: CodeBlockLoading,
-    ssr: false,
   },
 );
 
@@ -39,7 +38,6 @@ export const LazyShareDialog = dynamic(
     })),
   {
     loading: ShareDialogLoading,
-    ssr: false,
   },
 );
 
@@ -56,7 +54,6 @@ export const LazyCombobox = dynamic(
         </span>
       </div>
     ),
-    ssr: false,
   },
 );
 
@@ -71,6 +68,5 @@ export const LazyPagination = dynamic(
         <div className="h-10 w-64 bg-muted/50 rounded-md animate-pulse" />
       </div>
     ),
-    ssr: false,
   },
 );

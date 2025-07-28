@@ -21,11 +21,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Separator } from "@/components/ui/separator";
-import { formatDate, formatNumber, formatRelativeTime } from "@/lib/utils";
+import { formatDate, formatRelativeTime } from "@/lib/utils";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
 import type { ShareSnippetClientProps } from "@/types";
+import { NumberTicker } from "@/components/magicui/number-ticker";
 
 export default function ShareSnippetClient({
   snippet,
@@ -37,6 +38,7 @@ export default function ShareSnippetClient({
   const [viewTracked, setViewTracked] = useState(false);
   const { setTheme } = useTheme();
 
+  // Handle theme setting and view tracking after client mount
   useEffect(() => {
     if (viewTracked) return;
 
@@ -61,16 +63,11 @@ export default function ShareSnippetClient({
           },
         );
 
-        const result = await response.json();
-
         if (response.ok) {
           setViewTracked(true);
-          console.log("View tracked successfully:", result);
-        } else {
-          console.log("View not tracked:", result);
         }
-      } catch (error) {
-        console.error("Failed to track view:", error);
+      } catch {
+        console.error("Failed to track view");
       }
     };
 
@@ -100,8 +97,7 @@ export default function ShareSnippetClient({
       setTimeout(() => {
         router.push("/dashboard");
       }, 1500);
-    } catch (error) {
-      console.error("Error copying snippet:", error);
+    } catch {
       toast.error("Failed to copy snippet");
     } finally {
       setCopying(false);
@@ -156,8 +152,7 @@ export default function ShareSnippetClient({
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       toast.success("Code downloaded!", { icon: "⬇️" });
-    } catch (error) {
-      console.error("Download failed:", error);
+    } catch {
       toast.error("Failed to download code");
     }
   };
@@ -172,11 +167,13 @@ export default function ShareSnippetClient({
               <span>Public Snippet</span>
               <Badge variant="outline" className="ml-2">
                 <Eye className="w-3 h-3 mr-1" />
-                {snippet.viewCount} views
+                <NumberTicker value={snippet.viewCount} /> views
               </Badge>
               <span className="text-muted-foreground/60">•</span>
               <Clock className="w-3 h-3" />
-              <span>{formatRelativeTime(snippet.updatedAt)}</span>
+              <span suppressHydrationWarning>
+                {formatRelativeTime(snippet.updatedAt)}
+              </span>
             </div>
 
             <div className="flex flex-col md:flex-row items-center justify-start md:justify-between">
@@ -237,7 +234,9 @@ export default function ShareSnippetClient({
 
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
-                <span>Created {formatDate(snippet.createdAt)}</span>
+                <span suppressHydrationWarning>
+                  Created {formatDate(snippet.createdAt)}
+                </span>
               </div>
 
               <Badge variant="secondary" className="font-mono">
@@ -268,7 +267,7 @@ export default function ShareSnippetClient({
             <CodeBlock
               code={snippet.code}
               language={snippet.language}
-              highlightTheme={ownerHighlightTheme} // Pass owner's theme preference
+              highlightTheme={ownerHighlightTheme}
               title={snippet.title}
               showCopyButton={true}
               showDownloadButton={true}
@@ -279,66 +278,78 @@ export default function ShareSnippetClient({
 
           <Card className="border-0 shadow-xl bg-card/50 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
+              <CardTitle className="text-xl flex items-center gap-2 my-4 mx-2">
                 <Code className="w-5 h-5" />
                 Snippet Details
               </CardTitle>
             </CardHeader>
+
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+                {/* Left Column */}
+                <div className="space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between">
                     <span className="text-sm font-medium text-muted-foreground">
                       Language
                     </span>
-                    <Badge variant="secondary" className="font-mono">
+                    <Badge
+                      variant="secondary"
+                      className="font-mono w-fit mt-1 sm:mt-0"
+                    >
                       {snippet.language.charAt(0).toUpperCase() +
                         snippet.language.slice(1)}
                     </Badge>
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between">
                     <span className="text-sm font-medium text-muted-foreground">
                       Views
                     </span>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 mt-1 sm:mt-0">
                       <Eye className="w-4 h-4 text-muted-foreground" />
-                      <span>{formatNumber(snippet.viewCount)}</span>
+                      <NumberTicker value={snippet.viewCount} />
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between">
                     <span className="text-sm font-medium text-muted-foreground">
                       Lines of Code
                     </span>
-                    <span>{snippet.code.split("\n").length}</span>
+                    <NumberTicker value={snippet.code.split("\n").length} />
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+                {/* Right Column */}
+                <div className="space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between">
                     <span className="text-sm font-medium text-muted-foreground">
                       Created
                     </span>
-                    <span className="text-sm">
+                    <span
+                      className="text-sm mt-1 sm:mt-0"
+                      suppressHydrationWarning
+                    >
                       {formatDate(snippet.createdAt)}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between">
                     <span className="text-sm font-medium text-muted-foreground">
                       Last Updated
                     </span>
-                    <span className="text-sm">
+                    <span
+                      className="text-sm mt-1 sm:mt-0"
+                      suppressHydrationWarning
+                    >
                       {formatDate(snippet.updatedAt)}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between">
                     <span className="text-sm font-medium text-muted-foreground">
                       Character Count
                     </span>
-                    <span>{formatNumber(snippet.code.length)}</span>
+                    <NumberTicker value={snippet.code.length} />
                   </div>
                 </div>
               </div>

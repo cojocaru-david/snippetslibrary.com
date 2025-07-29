@@ -55,5 +55,5 @@ If you need to redeploy with a clean database run
 > [!WARNING]  
 > This will nuke your db, delete all data
 ```bash
-.docker-deploy --clean-db
+./docker-deploy.sh --clean-db
 ```

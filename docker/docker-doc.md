@@ -57,4 +57,3 @@ If you need to redeploy with a clean database run
 ```bash
 .docker-deploy --clean-db
 ```
-```

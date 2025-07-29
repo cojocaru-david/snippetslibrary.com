@@ -52,8 +52,8 @@ chmod +x docker-deploy.sh
 ```
 
 If you need to redeploy with a clean database run
-[> [!WARNING]
-> This will nuke your db, delete all data]
+> [!WARNING]  
+> This will nuke your db, delete all data
 ```bash
 .docker-deploy --clean-db
 ```

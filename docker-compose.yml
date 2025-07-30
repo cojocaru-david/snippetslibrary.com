@@ -1,0 +1,88 @@
+services:
+  frontend_builder:
+    container_name: codesnippets_frontend_builder
+    build:
+      context: .
+      dockerfile: ./docker/bun/Dockerfile
+      target: frontend_copier
+    volumes:
+      - frontend_dist_volume:/frontend_dist_output
+    command: >
+      bash -c "
+        if [ -d /usr/local/app/client/dist ]; then
+          cp -a /usr/local/app/client/dist/. /frontend_dist_output;
+          echo 'Frontend assets copied to frontend_dist_volume successfully.';
+        else
+          echo 'ERROR: Frontend build output /usr/local/app/client/dist not found in builder stage. Check bun/Dockerfile build:client script.';
+          exit 1;
+        fi
+      "
+    profiles: ["build-frontend"]
+    restart: "no"
+
+  app:
+    container_name: codesnippets_app
+    build:
+      context: .
+      dockerfile: ./docker/bun/Dockerfile
+      target: app_runner
+    env_file: ./server/.env
+    restart: unless-stopped
+    expose:
+      - "3001"
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+  nginx:
+    container_name: codesnippets_nginx
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    ports:
+      - "80:80"
+    env_file: ./server/.env
+    restart: unless-stopped
+    volumes:
+      - frontend_dist_volume:/usr/share/nginx/html
+    depends_on:
+      app:
+        condition: service_started
+
+  migrator:
+    container_name: codesnippets_migrator
+    build:
+      context: .
+      dockerfile: ./docker/bun/Dockerfile
+      target: app_runner
+    env_file: ./server/.env
+    depends_on:
+      db:
+        condition: service_healthy
+
+    command: ["bash", "-c", "cd /usr/local/app/server && bun src/migrate.ts"]
+    restart: "no"
+
+  db:
+    image: postgres:latest
+    container_name: codesnippets_db
+    environment:
+      POSTGRES_PASSWORD: password_replace_me
+      POSTGRES_DB: snippetslibrary
+    restart: unless-stopped
+    shm_size: 128mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d snippetslibrary"]
+      interval: 5s
+      retries: 5
+      start_period: 30s
+      timeout: 5s
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
+    driver: local
+  frontend_dist_volume:
+    driver: local

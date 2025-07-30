@@ -6,11 +6,29 @@ import { sessions, users } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import type { User, AuthSession } from 'shared';
 
+// Github_client_id - fail if not provided in production
+if (!process.env.GITHUB_CLIENT_ID) {
+  console.error('❌ GITHUB_CLIENT_ID is required but not set');
+  process.exit(1);
+}
+
+// Github_client_secret - fail if not provided in production
+if (!process.env.GITHUB_CLIENT_SECRET) {
+  console.error('❌ GITHUB_CLIENT_SECRET is required but not set');
+  process.exit(1);
+}
+
+// Github_redirect_uri - fail if not provided in production
+if (!process.env.GITHUB_REDIRECT_URI) {
+  console.error('❌ GITHUB_REDIRECT_URI is required but not set');
+  process.exit(1);
+}
+
 // GitHub OAuth setup
 export const github = new GitHub(
   process.env.GITHUB_CLIENT_ID!,
   process.env.GITHUB_CLIENT_SECRET!,
-  process.env.GITHUB_REDIRECT_URI || 'http://localhost:3001/auth/callback'
+  process.env.GITHUB_REDIRECT_URI!
 );
 
 // JWT secret - fail if not provided in production
@@ -52,13 +70,13 @@ export async function rotateSession(oldSessionId: string): Promise<string | null
   if (!oldSession.length) return null;
 
   const session = oldSession[0]!;
-  
+
   // Create new session
   const newSessionId = await createSession(session.userId, session.accessToken);
-  
+
   // Delete old session
   await db.delete(sessions).where(eq(sessions.id, oldSessionId));
-  
+
   return newSessionId;
 }
 
@@ -125,7 +143,7 @@ export async function getSession(sessionId: string): Promise<AuthSession | null>
       publicRepos: user.publicRepos || 0,
       followers: user.followers || 0,
       following: user.following || 0,
-      
+
       // SEO and customization fields with defaults
       seoTitle: user.seoTitle || null,
       seoDescription: user.seoDescription || null,
@@ -147,7 +165,7 @@ export async function getSession(sessionId: string): Promise<AuthSession | null>
       enableAnalytics: user.enableAnalytics ?? false,
       twoFactorEnabled: user.twoFactorEnabled ?? false,
       twoFactorSecret: user.twoFactorSecret || null,
-      
+
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     },
@@ -192,7 +210,7 @@ export async function createOrUpdateUser(githubUser: any): Promise<User> {
       .set(userData)
       .where(eq(users.id, existingUser[0]!.id))
       .returning();
-    
+
     // Return with proper User type including all fields
     return {
       ...updatedUser!,
@@ -238,7 +256,7 @@ export async function createOrUpdateUser(githubUser: any): Promise<User> {
         twoFactorSecret: null,
       })
       .returning();
-    
+
     return newUser! as User;
   }
 }

@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     canonical: `${baseUrl}/auth/signin`,
   },
   robots: {
-    index: false, // Don't index authentication pages
+    index: false,
     follow: true,
     googleBot: {
       index: false,

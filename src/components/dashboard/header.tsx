@@ -5,10 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import React from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components//ui/avatar";
 import { ThemeToggle } from "@/components/custom/theme-toggle";
 import { Home, Plus, User, Settings, LogOut, Menu, X } from "lucide-react";
-import Logo from "../custom/logo";
+import Logo from "@/components/custom/logo";
+import { NumberTicker } from "@/components/magicui/number-ticker";
 
 export default function Header() {
   const { user, signOut } = useAuth();
@@ -105,7 +106,11 @@ export default function Header() {
                   {user?.name || "User"}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {snippetsCount} snippet{snippetsCount !== 1 ? "s" : ""}
+                  <NumberTicker
+                    value={snippetsCount}
+                    className="text-primary"
+                  />{" "}
+                  snippet{snippetsCount !== 1 ? "s" : ""}
                 </span>
               </div>
             </div>

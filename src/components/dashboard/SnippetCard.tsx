@@ -9,6 +9,7 @@ import {
   Globe,
   Lock,
   Calendar,
+  Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ export const SnippetCard = memo<SnippetCardProps>(function SnippetCard({
   onDelete,
   onCopyShareUrl,
   onOpenShareUrl,
+  onToggleBookmark,
   userSettings,
 }) {
   const handleEdit = useCallback(() => onEdit(snippet), [onEdit, snippet]);
@@ -48,6 +50,12 @@ export const SnippetCard = memo<SnippetCardProps>(function SnippetCard({
   const handleOpenShare = useCallback(() => {
     if (snippet.shareId) onOpenShareUrl(snippet.shareId);
   }, [onOpenShareUrl, snippet.shareId]);
+
+  const handleToggleBookmark = useCallback(() => {
+    if (onToggleBookmark) {
+      onToggleBookmark(snippet.id, snippet.isBookmarked || false);
+    }
+  }, [onToggleBookmark, snippet.id, snippet.isBookmarked]);
 
   return (
     <Card className="group hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border-border bg-card/50 backdrop-blur-sm flex flex-col h-full">
@@ -64,42 +72,65 @@ export const SnippetCard = memo<SnippetCardProps>(function SnippetCard({
             )}
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <div className="flex items-center gap-1">
+            {/* Bookmark Button */}
+            {onToggleBookmark && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-accent"
+                onClick={handleToggleBookmark}
+                className={`h-8 w-8 p-0 transition-all duration-200 hover:bg-accent ${
+                  snippet.isBookmarked
+                    ? "opacity-100 text-yellow-500 hover:text-yellow-600"
+                    : "opacity-0 group-hover:opacity-100 hover:text-yellow-500"
+                }`}
+                title={
+                  snippet.isBookmarked ? "Remove bookmark" : "Bookmark snippet"
+                }
               >
-                <MoreVertical className="h-4 w-4" />
+                <Star
+                  className={`h-4 w-4 ${snippet.isBookmarked ? "fill-current" : ""}`}
+                />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleEdit}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </DropdownMenuItem>
-              {snippet.isPublic && snippet.shareId && (
-                <>
-                  <DropdownMenuItem onClick={handleCopyShare}>
-                    <Copy className="h-4 w-4 mr-2" />
-                    Copy Share URL
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleOpenShare}>
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Open Share Link
-                  </DropdownMenuItem>
-                </>
-              )}
-              <DropdownMenuItem
-                onClick={handleDelete}
-                className="text-destructive"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            )}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-accent"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleEdit}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </DropdownMenuItem>
+                {snippet.isPublic && snippet.shareId && (
+                  <>
+                    <DropdownMenuItem onClick={handleCopyShare}>
+                      <Copy className="h-4 w-4 mr-2" />
+                      Copy Share URL
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleOpenShare}>
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Open Share Link
+                    </DropdownMenuItem>
+                  </>
+                )}
+                <DropdownMenuItem
+                  onClick={handleDelete}
+                  className="text-destructive"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         <div className="flex items-center justify-between mt-3">
@@ -142,7 +173,6 @@ export const SnippetCard = memo<SnippetCardProps>(function SnippetCard({
             showExpandButton={false}
             showCopyButton={false}
             showDownloadButton={false}
-            title={snippet.title}
           />
         </div>
 

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { snippets, users } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { snippets, users, snippetLikes } from "@/db/schema";
+import { eq, and, count, sql } from "drizzle-orm";
+import { isValidShareId } from "@/lib/security";
 
 export async function GET(
   request: NextRequest,
@@ -10,6 +11,19 @@ export async function GET(
 ) {
   try {
     const { shareId } = await params;
+    
+    if (!isValidShareId(shareId)) {
+      return NextResponse.json(
+        { error: "Invalid share ID format" },
+        { status: 400 },
+      );
+    }
+    
+    const clientIp =
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+
     const snippet = await db
       .select({
         id: snippets.id,
@@ -24,6 +38,7 @@ export async function GET(
         createdAt: snippets.createdAt,
         updatedAt: snippets.updatedAt,
         userName: users.name,
+        userId: snippets.userId,
       })
       .from(snippets)
       .leftJoin(users, eq(snippets.userId, users.id))
@@ -39,7 +54,60 @@ export async function GET(
 
     const foundSnippet = snippet[0];
 
-    return NextResponse.json(foundSnippet);
+    const [likesResult] = await db
+      .select({ count: count() })
+      .from(snippetLikes)
+      .where(eq(snippetLikes.snippetId, foundSnippet.id));
+
+    let hasLiked = false;
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    const owner = await db
+      .select({ settings: users.settings })
+      .from(users)
+      .where(eq(users.id, foundSnippet.userId))
+      .limit(1);
+
+    const likesEnabled = owner[0]?.settings?.userPreferences?.likes ?? true;
+
+    if (likesEnabled) {
+      if (userId) {
+        const userLike = await db
+          .select()
+          .from(snippetLikes)
+          .where(
+            and(
+              eq(snippetLikes.snippetId, foundSnippet.id),
+              eq(snippetLikes.userId, userId),
+            ),
+          )
+          .limit(1);
+        hasLiked = userLike.length > 0;
+      } else {
+        const ipLike = await db
+          .select()
+          .from(snippetLikes)
+          .where(
+            and(
+              eq(snippetLikes.snippetId, foundSnippet.id),
+              eq(snippetLikes.viewerIpHash, clientIp),
+              sql`${snippetLikes.userId} IS NULL`,
+            ),
+          )
+          .limit(1);
+        hasLiked = ipLike.length > 0;
+      }
+    }
+
+    const { ...snippetWithoutUserId } = foundSnippet;
+
+    return NextResponse.json({
+      ...snippetWithoutUserId,
+      likesCount: likesResult.count,
+      isLiked: hasLiked,
+      likesEnabled,
+    });
   } catch {
     return NextResponse.json(
       { error: "Failed to fetch snippet" },
@@ -54,6 +122,14 @@ export async function POST(
 ) {
   try {
     const { shareId } = await params;
+    
+    if (!isValidShareId(shareId)) {
+      return NextResponse.json(
+        { error: "Invalid share ID format" },
+        { status: 400 },
+      );
+    }
+    
     const session = await auth();
 
     if (!session?.user?.id) {

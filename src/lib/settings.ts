@@ -53,6 +53,7 @@ export async function updateUserSettings(
       userPreferences: {
         notifications: true,
         analytics: true,
+        likes: true,
         ...currentSettings?.userPreferences,
         ...settings.userPreferences,
       },
@@ -91,6 +92,7 @@ export async function initializeUserSettings(userId: string): Promise<boolean> {
     userPreferences: {
       notifications: true,
       analytics: true,
+      likes: true,
     },
   };
 
@@ -139,6 +141,7 @@ export async function updateUserPreferences(
   const currentPreferences = currentSettings?.userPreferences || {
     notifications: true,
     analytics: true,
+    likes: true,
   };
 
   const mergedPreferences: UserSettings["userPreferences"] = {
@@ -168,6 +171,7 @@ export function getDefaultSettings(): UserSettings {
     userPreferences: {
       notifications: true,
       analytics: true,
+      likes: true,
     },
   };
 }

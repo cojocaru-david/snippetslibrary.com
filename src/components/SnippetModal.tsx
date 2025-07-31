@@ -37,12 +37,34 @@ import { Combobox } from "@/components/ui/combobox";
 import { cn } from "@/lib/utils";
 import { getAllLanguages } from "@/lib/shiki";
 import toast from "react-hot-toast";
-import type { SnippetFormData, SnippetModalProps } from "@/types";
-import { snippetSchema } from "@/types";
+import type { SnippetModalProps } from "@/types";
 import detectLanguage from "@/lib/detect-lang";
+import { z } from "zod";
 
 const ALL_LANGUAGE_OPTIONS = getAllLanguages();
 const ALL_LANGUAGES = ALL_LANGUAGE_OPTIONS.map((lang) => lang.value);
+
+const formSchema = z.object({
+  title: z
+    .string()
+    .min(1, "Title is required")
+    .max(200, "Title must be less than 200 characters")
+    .refine((val) => val.trim().length > 0, "Title cannot be empty"),
+  description: z
+    .string()
+    .max(1000, "Description must be less than 1000 characters")
+    .optional(),
+  code: z
+    .string()
+    .min(1, "Code is required")
+    .max(200000, "Code must be less than 200,000 characters")
+    .refine((val) => val.trim().length > 0, "Code cannot be empty"),
+  language: z.string().min(1, "Language is required"),
+  tags: z.string().optional(),
+  isPublic: z.boolean().optional(),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 const detectLanguageAPI = async (
   code: string,
@@ -109,8 +131,8 @@ export function SnippetModal({
     setValue,
     watch,
     reset,
-  } = useForm<SnippetFormData>({
-    resolver: zodResolver(snippetSchema),
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
     mode: "onChange",
     defaultValues: {
       title: snippet?.title ?? "",
@@ -239,7 +261,7 @@ export function SnippetModal({
   }, [reset, onClose]);
 
   const onSubmit = useCallback(
-    async (data: SnippetFormData) => {
+    async (data: FormData) => {
       setIsSubmitting(true);
 
       try {

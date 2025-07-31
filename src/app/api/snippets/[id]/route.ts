@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { snippets } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { v4 as uuidv4 } from "uuid";
+import { generateSecureShareId } from "@/lib/security";
 import { z } from "zod";
 import { updateSnippetSchema } from "@/types";
 
@@ -67,7 +67,7 @@ export async function PUT(
     let shareId = existingSnippet[0].shareId;
     if (validatedData.isPublic !== undefined) {
       if (validatedData.isPublic && !shareId) {
-        shareId = uuidv4();
+        shareId = generateSecureShareId();
       } else if (!validatedData.isPublic) {
         shareId = null;
       }

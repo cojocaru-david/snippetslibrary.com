@@ -2,28 +2,10 @@ import { ReactNode } from "react";
 import { z } from "zod";
 import type { Snippet, PaginationInfo } from "./shared";
 
-// Snippet Modal related types
-export const snippetSchema = z.object({
-  title: z
-    .string()
-    .min(1, "Title is required")
-    .max(200, "Title must be less than 200 characters")
-    .refine((val) => val.trim().length > 0, "Title cannot be empty"),
-  description: z
-    .string()
-    .max(1000, "Description must be less than 1000 characters")
-    .optional(),
-  code: z
-    .string()
-    .min(1, "Code is required")
-    .max(200000, "Code must be less than 200,000 characters")
-    .refine((val) => val.trim().length > 0, "Code cannot be empty"),
-  language: z.string().min(1, "Language is required"),
-  tags: z.string().max(500, "Tags must be less than 500 characters").optional(),
-  isPublic: z.boolean(),
-});
+export { createSnippetSchema as snippetSchema } from "./api";
+import { createSnippetSchema } from "./api";
 
-export type SnippetFormData = z.infer<typeof snippetSchema>;
+export type SnippetFormData = z.infer<typeof createSnippetSchema>;
 
 export interface SnippetModalProps {
   isOpen: boolean;
@@ -88,6 +70,7 @@ export interface SnippetGridProps {
   onDelete: (id: string) => void;
   onCopyShareUrl: (shareId: string) => void;
   onOpenShareUrl: (shareId: string) => void;
+  onToggleBookmark?: (snippetId: string, isBookmarked: boolean) => void;
   userSettings?: {
     codeBlockSettings?: {
       theme?: string;
@@ -116,6 +99,7 @@ export interface SnippetCardProps {
   onDelete: (id: string) => void;
   onCopyShareUrl: (shareId: string) => void;
   onOpenShareUrl: (shareId: string) => void;
+  onToggleBookmark?: (snippetId: string, isBookmarked: boolean) => void;
   userSettings?: {
     codeBlockSettings?: {
       theme?: string;

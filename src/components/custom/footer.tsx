@@ -34,7 +34,18 @@ export default function Footer({ border = false }: { border?: boolean }) {
               >
                 snippetslibrary.com
               </a>{" "}
-              - All rights reserved.
+              - Under MIT License
+            </div>
+            <div className="text-sm text-muted-foreground">
+              - Created by{" "}
+              <a
+                href="https://github.com/cojocaru-david"
+                className="underline hover:text-primary"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Cojocaru David
+              </a>
             </div>
           </div>
 
@@ -58,6 +69,14 @@ export default function Footer({ border = false }: { border?: boolean }) {
                   href="/terms"
                 >
                   Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className="text-muted-foreground transition hover:text-foreground"
+                  href="/policies"
+                >
+                  Privacy Policy
                 </Link>
               </li>
             </ul>

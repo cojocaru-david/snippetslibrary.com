@@ -35,7 +35,7 @@ export const config = {
 
   session: {
     strategy: "database",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 7 * 24 * 60 * 60, // 7 days
     updateAge: 24 * 60 * 60, // 24 hours
   },
 
@@ -82,11 +82,15 @@ export const config = {
               userPreferences: {
                 notifications: true,
                 analytics: true,
+                likes: true,
               },
             };
           }
         } catch (err) {
-          console.error("Failed to enrich session user:", err);
+          console.error("[SESSION_ENRICHMENT] Error:", {
+            timestamp: new Date().toISOString(),
+            message: err instanceof Error ? err.message : "Unknown error",
+          });
         }
       }
 
@@ -113,13 +117,17 @@ export const config = {
                 userPreferences: {
                   notifications: true,
                   analytics: true,
+                  likes: true,
                 },
               },
               updatedAt: new Date(),
             })
             .where(eq(users.id, user.id));
         } catch (err) {
-          console.error("Error setting up new user:", err);
+          console.error("[NEW_USER_SETUP] Error:", {
+            timestamp: new Date().toISOString(),
+            message: err instanceof Error ? err.message : "Unknown error",
+          });
         }
       }
     },

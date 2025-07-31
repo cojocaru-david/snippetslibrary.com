@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { snippets } from "@/db/schema";
+import { snippets, snippetBookmarks } from "@/db/schema";
 import { eq, desc, and, or, ilike, count, sql } from "drizzle-orm";
-import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { createSnippetSchema } from "@/types";
+import { generateSecureShareId } from "@/lib/security";
 
 export async function GET(request: NextRequest) {
   try {
@@ -55,10 +55,36 @@ export async function GET(request: NextRequest) {
     }
 
     const userSnippets = await db
-      .select()
+      .select({
+        id: snippets.id,
+        title: snippets.title,
+        description: snippets.description,
+        code: snippets.code,
+        language: snippets.language,
+        tags: snippets.tags,
+        isPublic: snippets.isPublic,
+        shareId: snippets.shareId,
+        viewCount: snippets.viewCount,
+        userId: snippets.userId,
+        createdAt: snippets.createdAt,
+        updatedAt: snippets.updatedAt,
+        isBookmarked: sql<boolean>`CASE WHEN ${snippetBookmarks.id} IS NOT NULL THEN true ELSE false END`,
+      })
       .from(snippets)
+      .leftJoin(
+        snippetBookmarks,
+        and(
+          eq(snippets.id, snippetBookmarks.snippetId),
+          eq(snippetBookmarks.userId, session.user.id),
+        ),
+      )
       .where(and(...whereConditions))
-      .orderBy(desc(snippets.createdAt))
+      .orderBy(
+        desc(
+          sql`CASE WHEN ${snippetBookmarks.id} IS NOT NULL THEN 1 ELSE 0 END`,
+        ),
+        desc(snippets.createdAt),
+      )
       .limit(limit)
       .offset(offset);
 
@@ -94,10 +120,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+
+
     const body = await request.json();
     const validatedData = createSnippetSchema.parse(body);
 
-    const shareId = validatedData.isPublic ? uuidv4() : null;
+    const shareId = validatedData.isPublic ? generateSecureShareId() : null;
 
     const newSnippet = await db
       .insert(snippets)

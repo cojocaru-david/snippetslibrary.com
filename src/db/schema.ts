@@ -25,6 +25,7 @@ export type UserSettings = {
   userPreferences: {
     notifications: boolean;
     analytics: boolean;
+    likes: boolean;
   };
 };
 
@@ -53,6 +54,7 @@ export const users = pgTable(
         userPreferences: {
           notifications: true,
           analytics: true,
+          likes: true,
         },
       }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -124,7 +126,7 @@ export const snippets = pgTable(
     language: text("language").notNull(),
     tags: jsonb("tags").$type<string[]>().default([]),
     isPublic: boolean("is_public").default(false),
-    shareId: uuid("share_id").unique(),
+    shareId: text("share_id").unique(),
     viewCount: integer("view_count").default(0),
     userId: uuid("user_id")
       .references(() => users.id, { onDelete: "cascade" })
@@ -148,7 +150,7 @@ export const snippetViews = pgTable(
     snippetId: uuid("snippet_id")
       .references(() => snippets.id, { onDelete: "cascade" })
       .notNull(),
-    viewerIp: text("viewer_ip"),
+    viewerIpHash: text("viewer_ip_hash"),
     userId: uuid("user_id").references(() => users.id, {
       onDelete: "set null",
     }),
@@ -158,5 +160,54 @@ export const snippetViews = pgTable(
     snippetIdIdx: index("snippet_views_snippet_id_idx").on(table.snippetId),
     createdAtIdx: index("snippet_views_created_at_idx").on(table.createdAt),
     userIdIdx: index("snippet_views_user_id_idx").on(table.userId),
+  }),
+);
+
+export const snippetBookmarks = pgTable(
+  "snippet_bookmarks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    snippetId: uuid("snippet_id")
+      .references(() => snippets.id, { onDelete: "cascade" })
+      .notNull(),
+    userId: uuid("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    userSnippetIdx: index("snippet_bookmarks_user_snippet_idx").on(
+      table.userId,
+      table.snippetId,
+    ),
+    snippetIdIdx: index("snippet_bookmarks_snippet_id_idx").on(table.snippetId),
+    userIdIdx: index("snippet_bookmarks_user_id_idx").on(table.userId),
+  }),
+);
+
+export const snippetLikes = pgTable(
+  "snippet_likes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    snippetId: uuid("snippet_id")
+      .references(() => snippets.id, { onDelete: "cascade" })
+      .notNull(),
+    userId: uuid("user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    viewerIpHash: text("viewer_ip_hash"), // Hashed IP for privacy compliance
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    snippetIdIdx: index("snippet_likes_snippet_id_idx").on(table.snippetId),
+    userIdIdx: index("snippet_likes_user_id_idx").on(table.userId),
+    ipSnippetIdx: index("snippet_likes_ip_snippet_idx").on(
+      table.viewerIpHash,
+      table.snippetId,
+    ),
+    userSnippetIdx: index("snippet_likes_user_snippet_idx").on(
+      table.userId,
+      table.snippetId,
+    ),
   }),
 );

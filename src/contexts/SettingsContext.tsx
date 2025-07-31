@@ -12,7 +12,6 @@ import { useSession } from "next-auth/react";
 import { UserSettings } from "@/db/schema";
 import type { SettingsContextType, SettingsProviderProps } from "@/types";
 
-// Default settings defined here to avoid server imports on client
 const getDefaultSettings = (): UserSettings => ({
   codeBlockSettings: {
     theme: "github-dark",
@@ -28,6 +27,7 @@ const getDefaultSettings = (): UserSettings => ({
   userPreferences: {
     notifications: true,
     analytics: true,
+    likes: true,
   },
 });
 
@@ -52,7 +52,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
   });
 
   const fetchSettings = useCallback(async () => {
-    // Cache duration: 5 minutes
     const CACHE_DURATION = 5 * 60 * 1000;
     if (
       status !== "authenticated" ||
@@ -63,7 +62,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
       return;
     }
 
-    // Check cache first
     const now = Date.now();
     const cache = cacheRef.current;
     if (
@@ -85,7 +83,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         if (response.status === 404) {
           const defaultSettings = getDefaultSettings();
           setSettings(defaultSettings);
-          // Cache the default settings
           cacheRef.current = {
             settings: defaultSettings,
             timestamp: now,
@@ -100,7 +97,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
       const data = await response.json();
       setSettings(data);
 
-      // Cache the fetched settings
       cacheRef.current = {
         settings: data,
         timestamp: now,
@@ -110,7 +106,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
       setError(err instanceof Error ? err.message : "Unknown error");
       const defaultSettings = getDefaultSettings();
       setSettings(defaultSettings);
-      // Cache the default settings even on error
       cacheRef.current = {
         settings: defaultSettings,
         timestamp: now,
@@ -145,7 +140,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         const updatedSettings = await response.json();
         setSettings(updatedSettings);
 
-        // Update cache
         cacheRef.current = {
           settings: updatedSettings,
           timestamp: Date.now(),
@@ -205,7 +199,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
   );
 
   const refreshSettings = useCallback(async () => {
-    // Clear cache and force refetch
     cacheRef.current = {
       settings: null,
       timestamp: 0,
@@ -216,7 +209,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
   }, [fetchSettings]);
 
   useEffect(() => {
-    // Clear cache if user changes
     if (session?.user?.id !== cacheRef.current.userId) {
       cacheRef.current = {
         settings: null,

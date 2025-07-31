@@ -107,6 +107,14 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   alternates: {
     canonical: baseUrl,
+    languages: {
+      "en-US": baseUrl,
+    },
+  },
+  other: {
+    "theme-color": "#e17009",
+    "color-scheme": "light dark",
+    "msapplication-TileColor": "#e17009",
   },
 };
 
@@ -175,15 +183,20 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
+        
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
+        />
+        
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
       <body

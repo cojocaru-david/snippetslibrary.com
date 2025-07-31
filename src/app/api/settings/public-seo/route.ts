@@ -34,9 +34,8 @@ export async function GET() {
 
     // Fallback settings if no user has configured SEO settings
     return NextResponse.json({
-      title: "Amazing Code Snippets",
-      description:
-        "Discover and share amazing code snippets with the community",
+      title: "My Code Snippets",
+      description: "View and share code snippets with the community",
       keywords: [
         "programming",
         "code",
@@ -48,7 +47,6 @@ export async function GET() {
       ],
     });
   } catch {
-
     return NextResponse.json({
       title: "Amazing Code Snippets",
       description:

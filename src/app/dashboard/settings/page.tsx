@@ -56,6 +56,7 @@ export default function SettingsPage() {
     seoKeywords: "",
     notifications: true,
     analytics: true,
+    likes: true,
   });
 
   const [saveStates, setSaveStates] = useState({
@@ -80,6 +81,7 @@ export default function SettingsPage() {
         seoKeywords: settings.seoSettings?.keywords?.join(", ") || "",
         notifications: settings.userPreferences?.notifications ?? true,
         analytics: settings.userPreferences?.analytics ?? true,
+        likes: settings.userPreferences?.likes ?? true,
       });
     }
   }, [settings]);
@@ -100,7 +102,8 @@ export default function SettingsPage() {
       preferences:
         formData.notifications !==
           (settings.userPreferences?.notifications ?? true) ||
-        formData.analytics !== (settings.userPreferences?.analytics ?? true),
+        formData.analytics !== (settings.userPreferences?.analytics ?? true) ||
+        formData.likes !== (settings.userPreferences?.likes ?? true),
     };
   }, [formData, settings]);
 
@@ -124,7 +127,7 @@ export default function SettingsPage() {
   );
 
   const handlePreferenceChange = useCallback(
-    (field: "notifications" | "analytics", value: boolean) => {
+    (field: "notifications" | "analytics" | "likes", value: boolean) => {
       setFormData((prev) => ({ ...prev, [field]: value }));
     },
     [],
@@ -183,6 +186,7 @@ export default function SettingsPage() {
       await updateUserPreferences({
         notifications: formData.notifications,
         analytics: formData.analytics,
+        likes: formData.likes,
       });
       toast.success("Preferences saved successfully!");
     } catch {
@@ -190,7 +194,12 @@ export default function SettingsPage() {
     } finally {
       setSaveStates((prev) => ({ ...prev, preferences: false }));
     }
-  }, [formData.notifications, formData.analytics, updateUserPreferences]);
+  }, [
+    formData.notifications,
+    formData.analytics,
+    formData.likes,
+    updateUserPreferences,
+  ]);
 
   const themeOptions = useMemo(
     () => [
@@ -487,6 +496,13 @@ console.log(greet('World'));`}
               onChange={(checked) =>
                 handlePreferenceChange("analytics", checked)
               }
+            />
+
+            <PreferenceToggle
+              title="Likes Feature"
+              description="Enable like functionality on shared snippets"
+              checked={formData.likes}
+              onChange={(checked) => handlePreferenceChange("likes", checked)}
             />
 
             <div className="flex items-center justify-between pt-4 border-t">

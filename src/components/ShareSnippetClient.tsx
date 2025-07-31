@@ -15,6 +15,7 @@ import {
   ExternalLink,
   Clock,
   Globe,
+  Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,9 +37,14 @@ export default function ShareSnippetClient({
   const { user } = useAuth();
   const [copying, setCopying] = useState(false);
   const [viewTracked, setViewTracked] = useState(false);
+  const [likesCount, setLikesCount] = useState(snippet.likesCount || 0);
+  const [isLiked, setIsLiked] = useState(snippet.isLiked || false);
+  const [likingInProgress, setLikingInProgress] = useState(false);
+  const [likesEnabled, setLikesEnabled] = useState(
+    snippet.likesEnabled ?? true,
+  );
   const { setTheme } = useTheme();
 
-  // Handle theme setting and view tracking after client mount
   useEffect(() => {
     if (viewTracked) return;
 
@@ -75,6 +81,34 @@ export default function ShareSnippetClient({
     return () => clearTimeout(timer);
   }, [snippet.shareId, viewTracked, setTheme, snippet]);
 
+  useEffect(() => {
+    const fetchLikesData = async () => {
+      try {
+        const response = await fetch(
+          `/api/snippets/share/${snippet.shareId}/like`,
+          {
+            method: "GET",
+          },
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setLikesCount(data.likesCount || 0);
+          setIsLiked(data.isLiked || false);
+          setLikesEnabled(data.likesEnabled ?? true);
+        } else if (response.status === 403) {
+          setLikesEnabled(false);
+        }
+      } catch {
+        console.error("Failed to fetch likes data");
+      }
+    };
+
+    if (!user || snippet.likesEnabled === undefined) {
+      fetchLikesData();
+    }
+  }, [snippet.shareId, user, snippet.likesEnabled]);
+
   const handleCopyToDashboard = async () => {
     if (!user) {
       toast.error("Please sign in to copy snippets to your dashboard");
@@ -101,6 +135,38 @@ export default function ShareSnippetClient({
       toast.error("Failed to copy snippet");
     } finally {
       setCopying(false);
+    }
+  };
+
+  const handleToggleLike = async () => {
+    if (likingInProgress) return;
+
+    setLikingInProgress(true);
+    try {
+      const method = isLiked ? "DELETE" : "POST";
+      const response = await fetch(
+        `/api/snippets/share/${snippet.shareId}/like`,
+        {
+          method,
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to toggle like");
+      }
+
+      const data = await response.json();
+      setIsLiked(data.liked);
+      setLikesCount(data.likesCount);
+
+      toast.success(data.liked ? "❤️ Liked!" : "💔 Like removed");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to toggle like";
+      toast.error(message);
+    } finally {
+      setLikingInProgress(false);
     }
   };
 
@@ -194,6 +260,25 @@ export default function ShareSnippetClient({
                   <Download className="w-4 h-4 mr-2" />
                   Download
                 </Button>
+
+                {likesEnabled && (
+                  <Button
+                    onClick={handleToggleLike}
+                    disabled={likingInProgress}
+                    variant={isLiked ? "default" : "outline"}
+                    size="sm"
+                    className={
+                      isLiked ? "bg-red-500 hover:bg-red-600 text-white" : ""
+                    }
+                  >
+                    <Heart
+                      className={`w-4 h-4 mr-2 ${isLiked ? "fill-current" : ""}`}
+                    />
+                    {likingInProgress
+                      ? "..."
+                      : `${likesCount} ${likesCount === 1 ? "Like" : "Likes"}`}
+                  </Button>
+                )}
 
                 {user && (
                   <Button

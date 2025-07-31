@@ -33,6 +33,7 @@ export function SnippetGrid({
   onDelete,
   onCopyShareUrl,
   onOpenShareUrl,
+  onToggleBookmark,
   userSettings,
 }: SnippetGridProps) {
   if (loading) {
@@ -55,6 +56,7 @@ export function SnippetGrid({
           onDelete={onDelete}
           onCopyShareUrl={onCopyShareUrl}
           onOpenShareUrl={onOpenShareUrl}
+          onToggleBookmark={onToggleBookmark}
           userSettings={userSettings}
         />
       ))}

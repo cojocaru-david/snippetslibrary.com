@@ -12,6 +12,9 @@ export interface SharedSnippet {
   updatedAt: string;
   userName?: string;
   displayTheme?: string;
+  likesCount?: number;
+  isLiked?: boolean;
+  likesEnabled?: boolean;
 }
 
 export interface SEOSettings {
@@ -45,6 +48,9 @@ export interface Snippet {
   viewCount: number;
   createdAt: string;
   updatedAt: string;
+  isBookmarked?: boolean;
+  likesCount?: number;
+  isLiked?: boolean;
 }
 
 export interface PaginationInfo {

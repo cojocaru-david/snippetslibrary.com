@@ -19,10 +19,25 @@ CREATE TABLE "sessions" (
 	"expires" timestamp NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "snippet_bookmarks" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"snippet_id" uuid NOT NULL,
+	"user_id" uuid NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "snippet_likes" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"snippet_id" uuid NOT NULL,
+	"user_id" uuid,
+	"viewer_ip_hash" text,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "snippet_views" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"snippet_id" uuid NOT NULL,
-	"viewer_ip" text,
+	"viewer_ip_hash" text,
 	"user_id" uuid,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
@@ -35,7 +50,7 @@ CREATE TABLE "snippets" (
 	"language" text NOT NULL,
 	"tags" jsonb DEFAULT '[]'::jsonb,
 	"is_public" boolean DEFAULT false,
-	"share_id" uuid,
+	"share_id" text,
 	"view_count" integer DEFAULT 0,
 	"user_id" uuid NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -49,7 +64,7 @@ CREATE TABLE "users" (
 	"email" text NOT NULL,
 	"email_verified" timestamp,
 	"image" text,
-	"settings" jsonb DEFAULT '{"codeBlockSettings":{"theme":"github-dark"},"layoutSettings":{"theme":"auto"},"seoSettings":{"title":"","description":"","keywords":[]},"userPreferences":{"notifications":true,"analytics":true}}'::jsonb,
+	"settings" jsonb DEFAULT '{"codeBlockSettings":{"theme":"github-dark"},"layoutSettings":{"theme":"auto"},"seoSettings":{"title":"","description":"","keywords":[]},"userPreferences":{"notifications":true,"analytics":true,"likes":true}}'::jsonb,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
@@ -64,11 +79,22 @@ CREATE TABLE "verification_tokens" (
 --> statement-breakpoint
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "snippet_bookmarks" ADD CONSTRAINT "snippet_bookmarks_snippet_id_snippets_id_fk" FOREIGN KEY ("snippet_id") REFERENCES "public"."snippets"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "snippet_bookmarks" ADD CONSTRAINT "snippet_bookmarks_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "snippet_likes" ADD CONSTRAINT "snippet_likes_snippet_id_snippets_id_fk" FOREIGN KEY ("snippet_id") REFERENCES "public"."snippets"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "snippet_likes" ADD CONSTRAINT "snippet_likes_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "snippet_views" ADD CONSTRAINT "snippet_views_snippet_id_snippets_id_fk" FOREIGN KEY ("snippet_id") REFERENCES "public"."snippets"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "snippet_views" ADD CONSTRAINT "snippet_views_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "snippets" ADD CONSTRAINT "snippets_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "accounts_user_id_idx" ON "accounts" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "sessions_user_id_idx" ON "sessions" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "snippet_bookmarks_user_snippet_idx" ON "snippet_bookmarks" USING btree ("user_id","snippet_id");--> statement-breakpoint
+CREATE INDEX "snippet_bookmarks_snippet_id_idx" ON "snippet_bookmarks" USING btree ("snippet_id");--> statement-breakpoint
+CREATE INDEX "snippet_bookmarks_user_id_idx" ON "snippet_bookmarks" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "snippet_likes_snippet_id_idx" ON "snippet_likes" USING btree ("snippet_id");--> statement-breakpoint
+CREATE INDEX "snippet_likes_user_id_idx" ON "snippet_likes" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "snippet_likes_ip_snippet_idx" ON "snippet_likes" USING btree ("viewer_ip_hash","snippet_id");--> statement-breakpoint
+CREATE INDEX "snippet_likes_user_snippet_idx" ON "snippet_likes" USING btree ("user_id","snippet_id");--> statement-breakpoint
 CREATE INDEX "snippet_views_snippet_id_idx" ON "snippet_views" USING btree ("snippet_id");--> statement-breakpoint
 CREATE INDEX "snippet_views_created_at_idx" ON "snippet_views" USING btree ("created_at");--> statement-breakpoint
 CREATE INDEX "snippet_views_user_id_idx" ON "snippet_views" USING btree ("user_id");--> statement-breakpoint

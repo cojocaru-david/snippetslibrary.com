@@ -26,10 +26,6 @@ export function SnippetFilters({
   activeFiltersCount,
   onClearAllFilters,
 }: SnippetFiltersProps) {
-  if (!showFilters) {
-    return null;
-  }
-
   const handleTagSelect = (value: string) => {
     if (value && !selectedTags.includes(value)) {
       setSelectedTags([...selectedTags, value]);

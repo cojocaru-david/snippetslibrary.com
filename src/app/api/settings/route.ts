@@ -74,6 +74,10 @@ export async function PATCH(request: NextRequest) {
           typeof body.userPreferences.analytics === "boolean"
             ? body.userPreferences.analytics
             : true,
+        likes:
+          typeof body.userPreferences.likes === "boolean"
+            ? body.userPreferences.likes
+            : true,
       };
     }
 

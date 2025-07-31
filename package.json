@@ -26,8 +26,8 @@
     "build:analyze": "ANALYZE=true next build",
     "start": "next start --port 3001",
     "lint": "next lint",
-    "db:generate": "drizzle-kit generate:pg",
-    "db:migrate": "drizzle-kit up:pg",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate && drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:push": "drizzle-kit push",
     "migrate": "npm run db:generate && npm run db:migrate",
@@ -55,6 +55,7 @@
     "highlight.js": "^11.11.1",
     "lucide-react": "^0.526.0",
     "motion": "^12.23.9",
+    "nanoid": "^5.1.5",
     "next": "15.4.4",
     "next-auth": "^5.0.0-beta.29",
     "pg": "^8.12.0",
@@ -63,7 +64,6 @@
     "react-hook-form": "^7.61.1",
     "react-hot-toast": "^2.5.2",
     "tailwind-merge": "^3.3.1",
-    "uuid": "^11.1.0",
     "zod": "^4.0.10"
   },
   "devDependencies": {

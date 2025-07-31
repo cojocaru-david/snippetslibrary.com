@@ -181,6 +181,36 @@ export default function DashboardPage() {
     window.open(shareUrl, "_blank");
   }, []);
 
+  const handleToggleBookmark = useCallback(
+    async (snippetId: string, isCurrentlyBookmarked: boolean) => {
+      try {
+        const method = isCurrentlyBookmarked ? "DELETE" : "POST";
+        const response = await fetch(`/api/snippets/${snippetId}/bookmark`, {
+          method,
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to toggle bookmark");
+        }
+
+        setSnippets((prevSnippets) =>
+          prevSnippets.map((snippet) =>
+            snippet.id === snippetId
+              ? { ...snippet, isBookmarked: !isCurrentlyBookmarked }
+              : snippet,
+          ),
+        );
+
+        toast.success(
+          isCurrentlyBookmarked ? "Bookmark removed" : "Snippet bookmarked!",
+        );
+      } catch {
+        toast.error("Failed to toggle bookmark");
+      }
+    },
+    [],
+  );
+
   const getUniqueLanguages = useMemo(() => {
     const languages = snippets.map((s) => s.language);
     return [...new Set(languages)].sort();
@@ -264,6 +294,7 @@ export default function DashboardPage() {
         onDelete={handleDeleteSnippet}
         onCopyShareUrl={handleCopyShareUrl}
         onOpenShareUrl={openShareUrl}
+        onToggleBookmark={handleToggleBookmark}
         userSettings={user?.settings}
       />
 

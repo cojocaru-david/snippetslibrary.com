@@ -36,7 +36,6 @@ function SignInContent() {
 
   const error = searchParams?.get("error");
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
       router.push(callbackUrl);

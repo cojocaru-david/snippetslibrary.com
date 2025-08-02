@@ -84,7 +84,7 @@ export default function NotFound() {
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <Link href="/">
                 <Button size="lg" className="w-full">
                   Go to Homepage
@@ -92,7 +92,7 @@ export default function NotFound() {
               </Link>
               <Link href="/dashboard">
                 <Button variant="outline" size="lg" className="w-full">
-                  Browse Snippets
+                  Browse Dashboard
                 </Button>
               </Link>
             </div>
@@ -100,7 +100,7 @@ export default function NotFound() {
             <div className="mt-8 text-sm text-muted-foreground">
               <p>
                 Looking for something specific?{" "}
-                <Link href="/" className="text-primary hover:underline">
+                <Link href="/explore" className="text-primary hover:underline">
                   Search our snippet library
                 </Link>
               </p>

@@ -160,7 +160,7 @@ export async function generateMetadata({
       ? seoSettings.description.trim()
       : "";
 
-  const description = seoDescription 
+  const description = seoDescription
     ? `${snippetDescription}. ${seoDescription}`
     : snippetDescription;
 
@@ -174,9 +174,7 @@ export async function generateMetadata({
       ? seoSettings.title.trim()
       : "";
 
-  const title = seoTitle 
-    ? `${snippetTitle} - ${seoTitle}`
-    : snippetTitle;
+  const title = seoTitle ? `${snippetTitle} - ${seoTitle}` : snippetTitle;
 
   const userKeywords = seoSettings?.keywords || [];
   const snippetKeywords = [snippet.language, ...snippet.tags].map((k) =>
@@ -244,7 +242,10 @@ export async function generateMetadata({
     },
     openGraph: {
       title: title.length > 60 ? `${snippetTitle}` : title,
-      description: description.length > 160 ? description.substring(0, 157) + "..." : description,
+      description:
+        description.length > 160
+          ? description.substring(0, 157) + "..."
+          : description,
       type: "article",
       url: shareUrl,
       siteName: "Snippets Library",
@@ -266,8 +267,13 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: title.length > 60 ? `${snippetTitle}` : title,
-      description: description.length > 160 ? description.substring(0, 157) + "..." : description,
-      creator: snippet.userName ? `@${snippet.userName.replace(/\s+/g, "")}` : undefined,
+      description:
+        description.length > 160
+          ? description.substring(0, 157) + "..."
+          : description,
+      creator: snippet.userName
+        ? `@${snippet.userName.replace(/\s+/g, "")}`
+        : undefined,
       site: "@SnippetsLibrary",
       images: [
         {
@@ -289,7 +295,9 @@ export async function generateMetadata({
       "article:published_time": snippet.createdAt,
       "article:modified_time": snippet.updatedAt,
       "article:section": "Programming",
-      ...(snippet.tags.length > 0 && { "article:tag": snippet.tags.join(", ") }),
+      ...(snippet.tags.length > 0 && {
+        "article:tag": snippet.tags.join(", "),
+      }),
       "programming-language": snippet.language,
       "code-lines": snippet.code.split("\n").length.toString(),
     },
@@ -304,9 +312,10 @@ export default async function ShareSnippetPage({ params }: PageProps) {
     notFound();
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
   const shareUrl = `${baseUrl}/share/${shareId}`;
-  
+
   const snippetDescription =
     snippet.description && snippet.description.trim()
       ? snippet.description.trim()
@@ -325,12 +334,9 @@ export default async function ShareSnippetPage({ params }: PageProps) {
     },
     url: shareUrl,
     codeSampleType: "full",
-    keywords: [
-      ...snippet.tags,
-      snippet.language,
-      "code",
-      "snippet",
-    ].filter(Boolean).join(", "),
+    keywords: [...snippet.tags, snippet.language, "code", "snippet"]
+      .filter(Boolean)
+      .join(", "),
     dateCreated: snippet.createdAt,
     dateModified: snippet.updatedAt,
     datePublished: snippet.createdAt,

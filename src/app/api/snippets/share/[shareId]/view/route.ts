@@ -11,7 +11,7 @@ export async function POST(
 ) {
   try {
     const { shareId } = await params;
-    
+
     if (!isValidShareId(shareId)) {
       return NextResponse.json(
         { error: "Invalid share ID format" },

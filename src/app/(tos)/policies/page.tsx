@@ -22,7 +22,6 @@ import {
   Edit,
   Lock,
   Mail,
-  AlertCircle,
   Eye,
 } from "lucide-react";
 

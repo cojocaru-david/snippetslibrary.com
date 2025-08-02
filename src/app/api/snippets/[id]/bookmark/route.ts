@@ -54,6 +54,7 @@ export async function POST(
 
     return NextResponse.json({ success: true, bookmarked: true });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error bookmarking snippet:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -86,6 +87,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, bookmarked: false });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error removing bookmark:", error);
     return NextResponse.json(
       { error: "Internal server error" },

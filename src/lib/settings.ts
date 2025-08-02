@@ -17,6 +17,7 @@ export async function getUserSettings(
 
     return result[0]?.settings || null;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error fetching user settings:", error);
     return null;
   }

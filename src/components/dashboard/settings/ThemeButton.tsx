@@ -1,42 +1,63 @@
-import { memo } from "react";
-import { Sun, Check } from "lucide-react";
+import React from "react";
+import { motion } from "framer-motion";
+import { CheckCircle2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const ThemeButton = memo<{
+const ThemeButton = ({
+  value,
+  label,
+  icon: Icon,
+  selected,
+  onClick,
+}: {
   value: "light" | "dark" | "auto";
   label: string;
-  icon: typeof Sun;
+  icon: React.ComponentType<{ className?: string }>;
   selected: boolean;
   onClick: () => void;
-}>(function ThemeButton({ label, icon: Icon, selected, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`group relative flex flex-col items-center gap-1.5 rounded-xl border transition-all px-4 py-3
-        backdrop-blur-sm
-        ${
+}) => (
+  <motion.button
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    onClick={onClick}
+    className={cn(
+      "relative group p-4 rounded-xl border-2 transition-all duration-300 text-left",
+      "hover:shadow-lg hover:shadow-primary/10",
+      selected
+        ? "border-primary bg-primary/5 shadow-md shadow-primary/20"
+        : "border-border hover:border-primary/50 bg-card/50",
+    )}
+  >
+    <div className="flex items-center gap-3">
+      <div
+        className={cn(
+          "p-2 rounded-lg transition-colors",
           selected
-            ? "border-primary bg-primary/10 shadow-sm"
-            : "border-border hover:border-primary/40 hover:bg-muted/30"
-        } focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60`}
-    >
-      <Icon
-        className={`w-5 h-5 transition-transform ${
-          selected ? "scale-110 text-primary" : "text-muted-foreground"
-        }`}
-      />
-      <span
-        className={`text-xs font-medium transition-colors ${
-          selected ? "text-primary" : "text-muted-foreground"
-        }`}
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted group-hover:bg-primary/10",
+        )}
       >
-        {label}
-      </span>
-
-      {selected && (
-        <Check className="absolute top-2 right-2 w-4 h-4 text-primary/90 animate-in fade-in" />
-      )}
-    </button>
-  );
-});
+        <Icon className="w-4 h-4" />
+      </div>
+      <div>
+        <div className="font-medium text-sm">{label}</div>
+        <div className="text-xs text-muted-foreground">
+          {value === "auto" && "Follow system"}
+          {value === "light" && "Always light"}
+          {value === "dark" && "Always dark"}
+        </div>
+      </div>
+    </div>
+    {selected && (
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center"
+      >
+        <CheckCircle2 className="w-3 h-3 text-primary-foreground" />
+      </motion.div>
+    )}
+  </motion.button>
+);
 
 export default ThemeButton;

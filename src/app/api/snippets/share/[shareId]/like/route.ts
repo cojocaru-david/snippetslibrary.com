@@ -102,6 +102,7 @@ export async function POST(
       likesCount: likesResult.count,
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("[LIKE_SNIPPET] Error:", {
       timestamp: new Date().toISOString(),
       message: error instanceof Error ? error.message : "Unknown error",
@@ -168,6 +169,7 @@ export async function DELETE(
       likesCount: likesResult.count,
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("[UNLIKE_SNIPPET] Error:", {
       timestamp: new Date().toISOString(),
       message: error instanceof Error ? error.message : "Unknown error",
@@ -266,6 +268,7 @@ export async function GET(
       likesEnabled: true,
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("[GET_LIKE_STATUS] Error:", {
       timestamp: new Date().toISOString(),
       message: error instanceof Error ? error.message : "Unknown error",

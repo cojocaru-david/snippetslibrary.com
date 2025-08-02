@@ -10,7 +10,6 @@ export function hashIP(ip: string): string {
 
   let processedIP = ip;
   if (ip.includes(".") && !ip.includes(":")) {
-
     const parts = ip.split(".");
     if (parts.length === 4) {
       processedIP = `${parts[0]}.${parts[1]}.${parts[2]}.0`;
@@ -20,10 +19,11 @@ export function hashIP(ip: string): string {
   return createHash("sha256")
     .update(`${processedIP}:${salt}`)
     .digest("hex")
-    .substring(0, 16); 
+    .substring(0, 16);
 }
 
-const SHARE_ID_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const SHARE_ID_ALPHABET =
+  "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 const SHARE_ID_LENGTH = 24;
 
 export function generateSecureShareId(): string {
@@ -32,7 +32,7 @@ export function generateSecureShareId(): string {
 }
 
 export function isValidShareId(shareId: string): boolean {
-  if (!shareId || typeof shareId !== 'string') {
+  if (!shareId || typeof shareId !== "string") {
     return false;
   }
 
@@ -40,13 +40,12 @@ export function isValidShareId(shareId: string): boolean {
     return false;
   }
 
-  return shareId.split('').every(char => SHARE_ID_ALPHABET.includes(char));
+  return shareId.split("").every((char) => SHARE_ID_ALPHABET.includes(char));
 }
 
 export function getClientIP(request: {
   headers: { get: (key: string) => string | null };
 }): string {
-
   const forwardedFor = request.headers.get("x-forwarded-for");
   const realIP = request.headers.get("x-real-ip");
   const cfConnectingIP = request.headers.get("cf-connecting-ip");

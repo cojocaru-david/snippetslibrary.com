@@ -87,6 +87,7 @@ export const config = {
             };
           }
         } catch (err) {
+          // eslint-disable-next-line no-console
           console.error("[SESSION_ENRICHMENT] Error:", {
             timestamp: new Date().toISOString(),
             message: err instanceof Error ? err.message : "Unknown error",
@@ -124,6 +125,7 @@ export const config = {
             })
             .where(eq(users.id, user.id));
         } catch (err) {
+          // eslint-disable-next-line no-console
           console.error("[NEW_USER_SETUP] Error:", {
             timestamp: new Date().toISOString(),
             message: err instanceof Error ? err.message : "Unknown error",

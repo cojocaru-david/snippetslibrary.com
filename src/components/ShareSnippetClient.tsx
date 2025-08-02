@@ -8,26 +8,120 @@ import {
   Copy,
   Download,
   Eye,
-  User,
-  Calendar,
-  Tag,
   BookmarkPlus,
   ExternalLink,
-  Clock,
   Globe,
   Heart,
+  Share2,
+  ChevronRight,
+  FileText,
+  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { CodeBlock } from "@/components/CodeBlock";
-import { Separator } from "@/components/ui/separator";
 import { formatDate, formatRelativeTime } from "@/lib/utils";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
 import type { ShareSnippetClientProps } from "@/types";
 import { NumberTicker } from "@/components/magicui/number-ticker";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+
+const ActionButton = ({
+  onClick,
+  disabled,
+  loading,
+  variant = "outline",
+  size = "sm",
+  icon,
+  children,
+  className,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+  variant?: "default" | "outline" | "secondary" | "ghost";
+  size?: "default" | "sm" | "lg";
+  icon?: React.ReactNode;
+  children?: React.ReactNode;
+  className?: string;
+}) => (
+  <Button
+    onClick={onClick}
+    disabled={disabled || loading}
+    variant={variant}
+    size={size}
+    className={cn(
+      "h-9 px-4 gap-2 font-medium transition-all duration-200 hover:scale-105 active:scale-95",
+      loading && "animate-pulse",
+      className,
+    )}
+  >
+    {loading ? (
+      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+    ) : (
+      icon
+    )}
+    {children}
+  </Button>
+);
+
+const StatsCard = ({
+  icon,
+  label,
+  value,
+  delay = 0,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number | string;
+  delay?: number;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay, duration: 0.4 }}
+    className="group"
+  >
+    <Card className="border-0 bg-card/50 backdrop-blur-sm hover:bg-card/70 transition-all duration-300 hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground font-medium">{label}</p>
+            <div className="text-2xl font-bold tabular-nums">
+              {typeof value === "number" ? (
+                <NumberTicker value={value} />
+              ) : (
+                value
+              )}
+            </div>
+          </div>
+          <div className="p-2 rounded-lg bg-muted/50 group-hover:scale-110 transition-transform duration-200">
+            {icon}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </motion.div>
+);
+
+const TagBadge = ({ tag, delay = 0 }: { tag: string; delay?: number }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ delay, duration: 0.3 }}
+  >
+    <Badge
+      variant="secondary"
+      className="bg-muted/50 hover:bg-muted border-0 text-xs px-3 py-1 font-medium transition-colors duration-200 cursor-default"
+    >
+      {tag}
+    </Badge>
+  </motion.div>
+);
 
 export default function ShareSnippetClient({
   snippet,
@@ -73,6 +167,7 @@ export default function ShareSnippetClient({
           setViewTracked(true);
         }
       } catch {
+        // eslint-disable-next-line no-console
         console.error("Failed to track view");
       }
     };
@@ -100,6 +195,7 @@ export default function ShareSnippetClient({
           setLikesEnabled(false);
         }
       } catch {
+        // eslint-disable-next-line no-console
         console.error("Failed to fetch likes data");
       }
     };
@@ -223,280 +319,324 @@ export default function ShareSnippetClient({
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-8">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-              <Globe className="w-4 h-4" />
-              <span>Public Snippet</span>
-              <Badge variant="outline" className="ml-2">
-                <Eye className="w-3 h-3 mr-1" />
-                <NumberTicker value={snippet.viewCount} /> views
-              </Badge>
-              <span className="text-muted-foreground/60">•</span>
-              <Clock className="w-3 h-3" />
-              <span suppressHydrationWarning>
-                {formatRelativeTime(snippet.updatedAt)}
-              </span>
-            </div>
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: snippet.title,
+          text:
+            snippet.description ||
+            `Check out this ${snippet.language} code snippet. Created by ${snippet.userName || "an anonymous user"}.`,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Link copied to clipboard!", { icon: "🔗" });
+      }
+    } catch {
+      toast.error("Failed to share");
+    }
+  };
 
-            <div className="flex flex-col md:flex-row items-center justify-start md:justify-between">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-4">
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="space-y-8"
+        >
+          <nav
+            className="flex items-center gap-2 text-sm text-muted-foreground"
+            aria-label="Breadcrumb"
+          >
+            <Globe className="h-4 w-4" />
+            <span>Public Snippet</span>
+            <ChevronRight className="h-3 w-3" />
+            <span className="max-w-32 truncate font-medium text-foreground sm:max-w-none">
+              {snippet.title}
+            </span>
+          </nav>
+
+          <header className="space-y-6">
+            <div className="space-y-4">
+              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
                 {snippet.title}
               </h1>
-              <div className="flex flex-wrap gap-3 mb-8">
-                <Button onClick={handleCopyCode} variant="outline" size="sm">
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copy Code
-                </Button>
+              {snippet.description && (
+                <p className="max-w-3xl text-lg text-muted-foreground leading-relaxed">
+                  {snippet.description}
+                </p>
+              )}
+            </div>
 
-                <Button
-                  onClick={handleDownloadCode}
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                {snippet.userName && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium">
+                      By {snippet.userName}
+                    </span>
+                    <span
+                      className="text-xs text-muted-foreground"
+                      suppressHydrationWarning
+                    >
+                      {formatRelativeTime(snippet.updatedAt)} (
+                      {formatDate(snippet.createdAt)})
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <ActionButton
+                  onClick={handleCopyCode}
+                  icon={<Copy className="h-4 w-4" />}
                   variant="outline"
                   size="sm"
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  Copy
+                </ActionButton>
+
+                <ActionButton
+                  onClick={handleDownloadCode}
+                  icon={<Download className="h-4 w-4" />}
+                  variant="outline"
+                  size="sm"
+                >
                   Download
-                </Button>
+                </ActionButton>
+
+                <ActionButton
+                  onClick={handleShare}
+                  icon={<Share2 className="h-4 w-4" />}
+                  variant="outline"
+                  size="sm"
+                >
+                  Share
+                </ActionButton>
+
+                {user ? (
+                  <ActionButton
+                    onClick={handleCopyToDashboard}
+                    loading={copying}
+                    icon={<BookmarkPlus className="h-4 w-4" />}
+                    variant="default"
+                    size="sm"
+                  >
+                    {copying ? "Saving..." : "Add to your dashboard"}
+                  </ActionButton>
+                ) : (
+                  <Link href="/auth/signin">
+                    <ActionButton
+                      onClick={() => {}}
+                      icon={<ExternalLink className="h-4 w-4" />}
+                      variant="default"
+                      size="sm"
+                    >
+                      Sign in to save
+                    </ActionButton>
+                  </Link>
+                )}
 
                 {likesEnabled && (
-                  <Button
+                  <ActionButton
                     onClick={handleToggleLike}
-                    disabled={likingInProgress}
-                    variant={isLiked ? "default" : "outline"}
-                    size="sm"
-                    className={
-                      isLiked ? "bg-red-500 hover:bg-red-600 text-white" : ""
+                    loading={likingInProgress}
+                    icon={
+                      <Heart
+                        className={cn("h-4 w-4", isLiked && "fill-current")}
+                      />
                     }
-                  >
-                    <Heart
-                      className={`w-4 h-4 mr-2 ${isLiked ? "fill-current" : ""}`}
-                    />
-                    {likingInProgress
-                      ? "..."
-                      : `${likesCount} ${likesCount === 1 ? "Like" : "Likes"}`}
-                  </Button>
-                )}
-
-                {user && (
-                  <Button
-                    onClick={handleCopyToDashboard}
-                    disabled={copying}
-                    size="sm"
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  >
-                    <BookmarkPlus className="w-4 h-4 mr-2" />
-                    {copying ? "Copying..." : "Copy to Dashboard"}
-                  </Button>
-                )}
-
-                {!user && (
-                  <Link href="/auth/signin">
-                    <Button variant="default" size="sm">
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Sign in to Copy
-                    </Button>
-                  </Link>
-                )}
-              </div>
-            </div>
-
-            {snippet.description && (
-              <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
-                {snippet.description}
-              </p>
-            )}
-
-            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-              {snippet.userName && (
-                <div className="flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  <span>By {snippet.userName}</span>
-                </div>
-              )}
-
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span suppressHydrationWarning>
-                  Created {formatDate(snippet.createdAt)}
-                </span>
-              </div>
-
-              <Badge variant="secondary" className="font-mono">
-                {snippet.language}
-              </Badge>
-
-              {snippet.tags.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <Tag className="w-4 h-4" />
-                  <div className="flex gap-1">
-                    {snippet.tags.slice(0, 3).map((tag, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                    {snippet.tags.length > 3 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{snippet.tags.length - 3}
-                      </Badge>
+                    variant={isLiked ? "default" : "outline"}
+                    className={cn(
+                      "rounded-full",
+                      isLiked ? "bg-red-500 hover:bg-red-600 text-white" : "",
                     )}
-                  </div>
-                </div>
+                    size="sm"
+                  >
+                    {likesCount}
+                  </ActionButton>
+                )}
+              </div>
+            </div>
+
+            {snippet.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {snippet.tags.map((tag, index) => (
+                  <TagBadge key={index} tag={tag} delay={index * 0.05} />
+                ))}
+              </div>
+            )}
+          </header>
+
+          <section className="space-y-6" aria-label="Code snippet">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <Card className="border-0 bg-card/50 backdrop-blur-sm shadow-lg overflow-hidden">
+                <CodeBlock
+                  code={snippet.code}
+                  language={snippet.language}
+                  highlightTheme={ownerHighlightTheme}
+                  title={snippet.title}
+                  showCopyButton={true}
+                  showDownloadButton={true}
+                  showExpandButton={true}
+                  filename={`${snippet.title.replace(/[^a-z0-9]/gi, "_")}.${snippet.language}`}
+                />
+              </Card>
+            </motion.div>
+
+            <div
+              className={cn(
+                "grid gap-4",
+                likesEnabled
+                  ? "grid-cols-2 sm:grid-cols-4"
+                  : "grid-cols-2 sm:grid-cols-3",
+              )}
+            >
+              <StatsCard
+                icon={<Eye className="h-5 w-5 text-blue-500" />}
+                label="Views"
+                value={snippet.viewCount}
+                delay={0.3}
+              />
+              <StatsCard
+                icon={<FileText className="h-5 w-5 text-green-500" />}
+                label="Lines"
+                value={snippet.code.split("\n").length}
+                delay={0.35}
+              />
+              <StatsCard
+                icon={<Zap className="h-5 w-5 text-yellow-500" />}
+                label="Characters"
+                value={snippet.code.length}
+                delay={0.4}
+              />
+              {likesEnabled && (
+                <StatsCard
+                  icon={<Heart className="h-5 w-5 text-red-500" />}
+                  label="Likes"
+                  value={likesCount}
+                  delay={0.45}
+                />
               )}
             </div>
-          </div>
+          </section>
 
-          <div className="mb-8">
-            <CodeBlock
-              code={snippet.code}
-              language={snippet.language}
-              highlightTheme={ownerHighlightTheme}
-              title={snippet.title}
-              showCopyButton={true}
-              showDownloadButton={true}
-              showExpandButton={true}
-              filename={`${snippet.title.replace(/[^a-z0-9]/gi, "_")}.${snippet.language}`}
-            />
-          </div>
-
-          <Card className="border-0 shadow-xl bg-card/50 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2 my-4 mx-2">
-                <Code className="w-5 h-5" />
-                Snippet Details
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Left Column */}
-                <div className="space-y-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      Language
-                    </span>
-                    <Badge
-                      variant="secondary"
-                      className="font-mono w-fit mt-1 sm:mt-0"
-                    >
-                      {snippet.language.charAt(0).toUpperCase() +
-                        snippet.language.slice(1)}
-                    </Badge>
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            aria-label="Snippet details"
+          >
+            <Card className="border-0 bg-card/50 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Code className="h-5 w-5 text-primary" />
                   </div>
-
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      Views
-                    </span>
-                    <div className="flex items-center gap-1 mt-1 sm:mt-0">
-                      <Eye className="w-4 h-4 text-muted-foreground" />
-                      <NumberTicker value={snippet.viewCount} />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      Lines of Code
-                    </span>
-                    <NumberTicker value={snippet.code.split("\n").length} />
-                  </div>
+                  <h2 className="text-xl font-semibold">Details</h2>
                 </div>
 
-                {/* Right Column */}
-                <div className="space-y-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      Created
-                    </span>
-                    <span
-                      className="text-sm mt-1 sm:mt-0"
-                      suppressHydrationWarning
-                    >
-                      {formatDate(snippet.createdAt)}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      Last Updated
-                    </span>
-                    <span
-                      className="text-sm mt-1 sm:mt-0"
-                      suppressHydrationWarning
-                    >
-                      {formatDate(snippet.updatedAt)}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      Character Count
-                    </span>
-                    <NumberTicker value={snippet.code.length} />
-                  </div>
-                </div>
-              </div>
-
-              {snippet.tags.length > 0 && (
-                <>
-                  <Separator />
-                  <div>
-                    <div className="text-sm font-medium mb-3 flex items-center gap-2">
-                      <Tag className="w-4 h-4" />
-                      Tags
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {snippet.tags.map((tag, index) => (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className="hover:bg-muted/50 transition-colors"
-                        >
-                          {tag}
+                <dl className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <dt className="text-sm font-medium text-muted-foreground">
+                        Language
+                      </dt>
+                      <dd>
+                        <Badge variant="secondary" className="font-mono">
+                          {snippet.language.charAt(0).toUpperCase() +
+                            snippet.language.slice(1)}
                         </Badge>
-                      ))}
+                      </dd>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <dt className="text-sm font-medium text-muted-foreground">
+                        Created
+                      </dt>
+                      <dd className="text-sm" suppressHydrationWarning>
+                        {formatDate(snippet.createdAt)}
+                      </dd>
                     </div>
                   </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
+
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <dt className="text-sm font-medium text-muted-foreground">
+                        Updated
+                      </dt>
+                      <dd className="text-sm" suppressHydrationWarning>
+                        {formatRelativeTime(snippet.updatedAt)}
+                      </dd>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <dt className="text-sm font-medium text-muted-foreground">
+                        Size
+                      </dt>
+                      <dd className="text-sm tabular-nums">
+                        {(snippet.code.length / 1024).toFixed(1)} KB
+                      </dd>
+                    </div>
+                  </div>
+                </dl>
+              </CardContent>
+            </Card>
+          </motion.section>
 
           {!user && (
-            <div className="text-center mt-12 p-8 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-xl border border-primary/20">
-              <div className="max-w-md mx-auto">
-                <h3 className="text-2xl font-bold mb-4">Love this snippet?</h3>
-                <p className="text-muted-foreground mb-6 text-lg">
-                  Create your own snippet library and organize your code
-                  collection.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Link href="/auth/signin">
-                    <Button
-                      size="lg"
-                      className="bg-primary text-primary-foreground hover:bg-primary/90 w-full sm:w-auto"
-                    >
-                      Get Started Free
-                      <ExternalLink className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Link>
-                  <Link href="/">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="w-full sm:w-auto"
-                    >
-                      <Code className="w-4 h-4 mr-2" />
-                      Explore More
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="text-center"
+              aria-label="Call to action"
+            >
+              <Card className="border-0 bg-gradient-to-br from-primary/5 to-primary/10 backdrop-blur-sm">
+                <CardContent className="p-8 lg:p-12">
+                  <div className="mx-auto max-w-2xl space-y-6">
+                    <div className="space-y-3">
+                      <h2 className="text-2xl font-bold lg:text-3xl">
+                        Build your snippet library
+                      </h2>
+                      <p className="text-lg text-muted-foreground">
+                        Join thousands of developers organizing and sharing code
+                        snippets.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
+                      <Link href="/auth/signin" className="sm:w-auto">
+                        <Button
+                          size="lg"
+                          className="w-full sm:w-auto shadow-lg"
+                        >
+                          <ExternalLink className="mr-2 h-5 w-5" />
+                          Get Started Free
+                        </Button>
+                      </Link>
+                      <Link href="/explore" className="sm:w-auto">
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="w-full sm:w-auto"
+                        >
+                          <Code className="mr-2 h-5 w-5" />
+                          Explore More
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.section>
           )}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -25,6 +25,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         return savedTheme;
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.warn("Failed to read UI theme from localStorage:", error);
     }
 
@@ -71,6 +72,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       try {
         localStorage.setItem("ui-theme", newTheme);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.warn("Failed to save UI theme to localStorage:", error);
       }
     },

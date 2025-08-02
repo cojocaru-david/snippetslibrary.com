@@ -91,6 +91,7 @@ const detectLanguageAPI = async (
     const result = await response.json();
     return result.language || "javascript";
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.warn("Language detection API failed:", error);
     return detectLanguage(code);
   }
@@ -211,6 +212,7 @@ export function SnippetModal({
           }
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.warn("Language detection failed:", error);
         if (isManual) {
           toast.error("Failed to detect language");
@@ -311,6 +313,7 @@ export function SnippetModal({
         onSuccess?.();
         handleClose();
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error saving snippet:", error);
         toast.error(
           error instanceof Error ? error.message : "Failed to save snippet",
@@ -369,6 +372,7 @@ export function SnippetModal({
       setValue("isPublic", true);
       return shareId;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error generating share link:", error);
       throw error;
     }

@@ -15,10 +15,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
-  Settings,
   Palette,
-  Search,
   Bell,
   Monitor,
   Sun,
@@ -26,8 +25,17 @@ import {
   Save,
   AlertCircle,
   Loader2,
+  Sparkles,
+  Eye,
+  Shield,
+  Zap,
+  User,
+  Globe,
+  Code,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 import {
   LazyCodeBlock,
@@ -35,6 +43,177 @@ import {
 } from "@/components/dashboard/LazyComponents";
 import ThemeButton from "@/components/dashboard/settings/ThemeButton";
 import PreferenceToggle from "@/components/dashboard/settings/PreferenceToggle";
+interface SettingsSectionProps {
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  iconColor: string;
+  children: React.ReactNode;
+  hasChanges?: boolean;
+  onSave?: () => void;
+  isSaving?: boolean;
+  saveLabel?: string;
+}
+
+const SettingsSection = ({
+  title,
+  description,
+  icon: Icon,
+  iconColor,
+  children,
+  hasChanges,
+  onSave,
+  isSaving,
+  saveLabel = "Save Changes",
+}: SettingsSectionProps) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+  >
+    <Card className="overflow-hidden border-0 shadow-sm bg-card/50 backdrop-blur-sm">
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div
+              className={cn(
+                "w-10 h-10 rounded-xl flex items-center justify-center",
+                iconColor,
+              )}
+            >
+              <Icon className="w-5 h-5" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">{title}</CardTitle>
+              <CardDescription className="text-sm">
+                {description}
+              </CardDescription>
+            </div>
+          </div>
+          <AnimatePresence>
+            {hasChanges && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                className="flex items-center gap-2"
+              >
+                <Badge
+                  variant="secondary"
+                  className="text-xs bg-amber-100 text-amber-800 border-amber-200"
+                >
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Unsaved
+                </Badge>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {children}
+        {onSave && (
+          <>
+            <Separator />
+            <div className="flex items-center justify-end">
+              <Button
+                onClick={onSave}
+                disabled={!hasChanges || isSaving}
+                size="sm"
+                className="min-w-[120px]"
+              >
+                <AnimatePresence mode="wait">
+                  {isSaving ? (
+                    <motion.div
+                      key="saving"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="flex items-center gap-2"
+                    >
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="save"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="flex items-center gap-2"
+                    >
+                      <Save className="w-4 h-4" />
+                      {saveLabel}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </Button>
+            </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  </motion.div>
+);
+
+const LoadingSkeleton = () => (
+  <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="space-y-8">
+        <div className="space-y-4">
+          <div className="h-10 bg-muted/50 rounded-xl w-64 animate-pulse" />
+          <div className="h-6 bg-muted/30 rounded-lg w-96 animate-pulse" />
+        </div>
+        <div className="space-y-6">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-80 bg-muted/20 rounded-2xl animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const ErrorState = ({ error }: { error: string }) => (
+  <div className="min-h-screen bg-gradient-to-br from-background via-background to-destructive/5 flex items-center justify-center">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="text-center space-y-6 max-w-md"
+    >
+      <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
+        <AlertCircle className="w-8 h-8 text-destructive" />
+      </div>
+      <div className="space-y-2">
+        <h2 className="text-2xl font-bold text-destructive">Settings Error</h2>
+        <p className="text-muted-foreground text-sm leading-relaxed">{error}</p>
+      </div>
+    </motion.div>
+  </div>
+);
+
+const UnauthenticatedState = () => (
+  <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="text-center space-y-6 max-w-md"
+    >
+      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+        <User className="w-8 h-8 text-primary" />
+      </div>
+      <div className="space-y-2">
+        <h2 className="text-2xl font-bold">Authentication Required</h2>
+        <p className="text-muted-foreground text-sm leading-relaxed">
+          Please sign in to access your personalized settings and preferences.
+        </p>
+      </div>
+    </motion.div>
+  </div>
+);
 
 export default function SettingsPage() {
   const { status } = useSession();
@@ -49,7 +228,7 @@ export default function SettingsPage() {
   } = useSettings();
 
   const [formData, setFormData] = useState({
-    theme: "auto",
+    theme: "auto" as "auto" | "light" | "dark",
     codeTheme: "github-dark",
     seoTitle: "",
     seoDescription: "",
@@ -65,16 +244,16 @@ export default function SettingsPage() {
     preferences: false,
   });
 
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState({
-    theme: false,
-    seo: false,
-    preferences: false,
-  });
+  const [themeList, setThemeList] = useState<
+    Array<{ value: string; label: string; category: string }>
+  >([]);
 
   useEffect(() => {
     if (settings) {
       setFormData({
-        theme: settings.layoutSettings?.theme || "auto",
+        theme:
+          (settings.layoutSettings?.theme as "auto" | "light" | "dark") ||
+          "auto",
         codeTheme: settings.codeBlockSettings?.theme || "github-dark",
         seoTitle: settings.seoSettings?.title || "",
         seoDescription: settings.seoSettings?.description || "",
@@ -85,6 +264,18 @@ export default function SettingsPage() {
       });
     }
   }, [settings]);
+
+  // Load theme list
+  useEffect(() => {
+    import("@/lib/shiki")
+      .then(({ getAllThemes }) => {
+        setThemeList(getAllThemes());
+      })
+      .catch(() => {
+        // eslint-disable-next-line no-console
+        console.error("Failed to load themes");
+      });
+  }, []);
 
   const unsavedChanges = useMemo(() => {
     if (!settings) return { theme: false, seo: false, preferences: false };
@@ -107,10 +298,7 @@ export default function SettingsPage() {
     };
   }, [formData, settings]);
 
-  useEffect(() => {
-    setHasUnsavedChanges(unsavedChanges);
-  }, [unsavedChanges]);
-
+  // Handlers
   const handleThemeChange = useCallback((theme: "light" | "dark" | "auto") => {
     setFormData((prev) => ({ ...prev, theme }));
   }, []);
@@ -133,15 +321,12 @@ export default function SettingsPage() {
     [],
   );
 
+  // Save functions
   const saveThemeSettings = useCallback(async () => {
     setSaveStates((prev) => ({ ...prev, theme: true }));
     try {
-      await updateLayoutSettings({
-        theme: formData.theme as "auto" | "light" | "dark",
-      });
-
+      await updateLayoutSettings({ theme: formData.theme });
       await updateCodeBlockSettings({ theme: formData.codeTheme });
-
       toast.success("Theme settings saved successfully!");
     } catch {
       toast.error("Failed to save theme settings");
@@ -210,96 +395,30 @@ export default function SettingsPage() {
     [],
   );
 
-  const [themeList, setThemeList] = useState<
-    Array<{ value: string; label: string; category: string }>
-  >([]);
-
-  useEffect(() => {
-    import("@/lib/shiki")
-      .then(({ getAllThemes }) => {
-        setThemeList(getAllThemes());
-      })
-      .catch(() => {
-        // eslint-disable-next-line no-console
-        console.error("Failed to load themes");
-      });
-  }, []);
-
-  if (status === "loading" || loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="space-y-8">
-          <div className="space-y-4">
-            <div className="h-8 bg-muted rounded-lg w-64 animate-pulse" />
-            <div className="h-5 bg-muted rounded w-96 animate-pulse" />
-          </div>
-
-          <div className="space-y-6">
-            <div className="h-96 bg-muted rounded-xl animate-pulse" />
-            <div className="h-64 bg-muted rounded-xl animate-pulse" />
-            <div className="h-48 bg-muted rounded-xl animate-pulse" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (status === "unauthenticated") {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Settings className="w-12 h-12 text-muted-foreground mx-auto" />
-          <h2 className="text-xl font-semibold">Authentication Required</h2>
-          <p className="text-muted-foreground max-w-md">
-            Please sign in to access your settings.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <AlertCircle className="w-12 h-12 text-destructive mx-auto" />
-          <h2 className="text-xl font-semibold text-destructive">
-            Settings Error
-          </h2>
-          <p className="text-muted-foreground max-w-md">{error}</p>
-        </div>
-      </div>
-    );
-  }
+  // Render states
+  if (status === "loading" || loading) return <LoadingSkeleton />;
+  if (status === "unauthenticated") return <UnauthenticatedState />;
+  if (error) return <ErrorState error={error} />;
 
   return (
-    <>
-      <div className="space-y-2 mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
-          Customize your experience and preferences
-        </p>
-      </div>
-
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Palette className="w-4 h-4 text-primary" />
-              </div>
-              <div>
-                <CardTitle>Theme & Appearance</CardTitle>
-                <CardDescription>
-                  Choose your preferred theme and code highlighting
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Application Theme</Label>
-              <div className="grid grid-cols-3 gap-3">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/10">
+      <div className="space-y-8">
+        <SettingsSection
+          title="Theme & Appearance"
+          description="Choose your preferred theme and code highlighting"
+          icon={Palette}
+          iconColor="bg-gradient-to-br from-purple-500/10 to-pink-500/10 text-purple-600"
+          hasChanges={unsavedChanges.theme}
+          onSave={saveThemeSettings}
+          isSaving={saveStates.theme}
+          saveLabel="Save Theme"
+        >
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <Label className="text-base font-semibold">
+                Application Theme
+              </Label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {themeOptions.map(({ value, label, icon }) => (
                   <ThemeButton
                     key={value}
@@ -313,8 +432,8 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">
+            <div className="space-y-4">
+              <Label className="text-base font-semibold">
                 Code Highlighting Theme
               </Label>
               <LazyCombobox
@@ -328,14 +447,18 @@ export default function SettingsPage() {
               />
             </div>
 
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Preview</Label>
-              <div className="border rounded-lg overflow-hidden">
-                <div className="bg-muted px-3 py-2 border-b flex items-center gap-2">
-                  <Badge variant="secondary" className="text-xs">
-                    {formData.codeTheme}
-                  </Badge>
-                </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-base font-semibold">Preview</Label>
+                <Badge variant="outline" className="text-xs">
+                  <Code className="w-3 h-3 mr-1" />
+                  {formData.codeTheme}
+                </Badge>
+              </div>
+              <motion.div
+                layout
+                className="border rounded-xl overflow-hidden shadow-sm"
+              >
                 <LazyCodeBlock
                   code={`function greet(name) {
   return \`Hello, \${name}!\`;
@@ -350,53 +473,24 @@ console.log(greet('World'));`}
                   showExpandButton={false}
                   maxHeight="150px"
                 />
-              </div>
+              </motion.div>
             </div>
+          </div>
+        </SettingsSection>
 
-            <div className="flex items-center justify-between pt-4 border-t">
-              <div className="text-sm text-muted-foreground">
-                {hasUnsavedChanges.theme && (
-                  <span className="text-amber-600">Unsaved changes</span>
-                )}
-              </div>
-              <Button
-                onClick={saveThemeSettings}
-                disabled={!hasUnsavedChanges.theme || saveStates.theme}
-                size="sm"
-              >
-                {saveStates.theme ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Theme
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-                <Search className="w-4 h-4 text-green-600" />
-              </div>
-              <div>
-                <CardTitle>SEO & Metadata</CardTitle>
-                <CardDescription>
-                  Configure default metadata for your public snippets
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        <SettingsSection
+          title="SEO & Metadata"
+          description="Configure default metadata for your public snippets"
+          icon={Globe}
+          iconColor="bg-gradient-to-br from-green-500/10 to-emerald-500/10 text-green-600"
+          hasChanges={unsavedChanges.seo}
+          onSave={saveSeoSettings}
+          isSaving={saveStates.seo}
+          saveLabel="Save SEO"
+        >
+          <div className="space-y-6">
             <div className="space-y-3">
-              <Label htmlFor="seo-title" className="text-sm font-medium">
+              <Label htmlFor="seo-title" className="text-base font-semibold">
                 Default SEO Title
               </Label>
               <Input
@@ -404,11 +498,15 @@ console.log(greet('World'));`}
                 value={formData.seoTitle}
                 onChange={(e) => handleSeoChange("seoTitle", e.target.value)}
                 placeholder="My Code Snippets"
+                className="h-12"
               />
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="seo-description" className="text-sm font-medium">
+              <Label
+                htmlFor="seo-description"
+                className="text-base font-semibold"
+              >
                 Default SEO Description
               </Label>
               <Textarea
@@ -418,13 +516,13 @@ console.log(greet('World'));`}
                   handleSeoChange("seoDescription", e.target.value)
                 }
                 placeholder="Collection of useful code snippets"
-                rows={3}
+                rows={4}
                 className="resize-none"
               />
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="seo-keywords" className="text-sm font-medium">
+              <Label htmlFor="seo-keywords" className="text-base font-semibold">
                 SEO Keywords
               </Label>
               <Input
@@ -432,54 +530,26 @@ console.log(greet('World'));`}
                 value={formData.seoKeywords}
                 onChange={(e) => handleSeoChange("seoKeywords", e.target.value)}
                 placeholder="code, programming, snippets"
+                className="h-12"
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Separate keywords with commas
               </p>
             </div>
+          </div>
+        </SettingsSection>
 
-            <div className="flex items-center justify-between pt-4 border-t">
-              <div className="text-sm text-muted-foreground">
-                {hasUnsavedChanges.seo && (
-                  <span className="text-amber-600">Unsaved changes</span>
-                )}
-              </div>
-              <Button
-                onClick={saveSeoSettings}
-                disabled={!hasUnsavedChanges.seo || saveStates.seo}
-                size="sm"
-              >
-                {saveStates.seo ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save SEO
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                <Bell className="w-4 h-4 text-blue-600" />
-              </div>
-              <div>
-                <CardTitle>Preferences</CardTitle>
-                <CardDescription>
-                  Manage your notification and privacy settings
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        <SettingsSection
+          title="Preferences"
+          description="Manage your notification and privacy settings"
+          icon={Shield}
+          iconColor="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 text-blue-600"
+          hasChanges={unsavedChanges.preferences}
+          onSave={savePreferences}
+          isSaving={saveStates.preferences}
+          saveLabel="Save Preferences"
+        >
+          <div className="space-y-4">
             <PreferenceToggle
               title="Email Notifications"
               description="Receive updates about your account and snippets"
@@ -487,6 +557,7 @@ console.log(greet('World'));`}
               onChange={(checked) =>
                 handlePreferenceChange("notifications", checked)
               }
+              icon={Bell}
             />
 
             <PreferenceToggle
@@ -496,6 +567,7 @@ console.log(greet('World'));`}
               onChange={(checked) =>
                 handlePreferenceChange("analytics", checked)
               }
+              icon={Zap}
             />
 
             <PreferenceToggle
@@ -503,37 +575,11 @@ console.log(greet('World'));`}
               description="Enable like functionality on shared snippets"
               checked={formData.likes}
               onChange={(checked) => handlePreferenceChange("likes", checked)}
+              icon={Eye}
             />
-
-            <div className="flex items-center justify-between pt-4 border-t">
-              <div className="text-sm text-muted-foreground">
-                {hasUnsavedChanges.preferences && (
-                  <span className="text-amber-600">Unsaved changes</span>
-                )}
-              </div>
-              <Button
-                onClick={savePreferences}
-                disabled={
-                  !hasUnsavedChanges.preferences || saveStates.preferences
-                }
-                size="sm"
-              >
-                {saveStates.preferences ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Preferences
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </SettingsSection>
       </div>
-    </>
+    </div>
   );
 }

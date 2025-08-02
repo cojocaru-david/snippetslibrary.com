@@ -97,12 +97,8 @@
           "name": "accounts_user_id_users_id_fk",
           "tableFrom": "accounts",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -110,10 +106,7 @@
       "compositePrimaryKeys": {
         "accounts_provider_provider_account_id_pk": {
           "name": "accounts_provider_provider_account_id_pk",
-          "columns": [
-            "provider",
-            "provider_account_id"
-          ]
+          "columns": ["provider", "provider_account_id"]
         }
       },
       "uniqueConstraints": {},
@@ -166,12 +159,8 @@
           "name": "sessions_user_id_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -271,12 +260,8 @@
           "name": "snippet_bookmarks_snippet_id_snippets_id_fk",
           "tableFrom": "snippet_bookmarks",
           "tableTo": "snippets",
-          "columnsFrom": [
-            "snippet_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["snippet_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -284,12 +269,8 @@
           "name": "snippet_bookmarks_user_id_users_id_fk",
           "tableFrom": "snippet_bookmarks",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -416,12 +397,8 @@
           "name": "snippet_likes_snippet_id_snippets_id_fk",
           "tableFrom": "snippet_likes",
           "tableTo": "snippets",
-          "columnsFrom": [
-            "snippet_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["snippet_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -429,12 +406,8 @@
           "name": "snippet_likes_user_id_users_id_fk",
           "tableFrom": "snippet_likes",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -534,12 +507,8 @@
           "name": "snippet_views_snippet_id_snippets_id_fk",
           "tableFrom": "snippet_views",
           "tableTo": "snippets",
-          "columnsFrom": [
-            "snippet_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["snippet_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -547,12 +516,8 @@
           "name": "snippet_views_user_id_users_id_fk",
           "tableFrom": "snippet_views",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -728,12 +693,8 @@
           "name": "snippets_user_id_users_id_fk",
           "tableFrom": "snippets",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -743,9 +704,7 @@
         "snippets_share_id_unique": {
           "name": "snippets_share_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "share_id"
-          ]
+          "columns": ["share_id"]
         }
       },
       "policies": {},
@@ -832,9 +791,7 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -869,10 +826,7 @@
       "compositePrimaryKeys": {
         "verification_tokens_identifier_token_pk": {
           "name": "verification_tokens_identifier_token_pk",
-          "columns": [
-            "identifier",
-            "token"
-          ]
+          "columns": ["identifier", "token"]
         }
       },
       "uniqueConstraints": {},

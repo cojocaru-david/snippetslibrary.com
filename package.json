@@ -31,7 +31,7 @@
     "db:studio": "drizzle-kit studio",
     "db:push": "drizzle-kit push",
     "migrate": "npm run db:generate && npm run db:migrate",
-    "format": "prettier --write ."
+    "format": "prettier --write ./src"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.10.0",

@@ -3,7 +3,7 @@
   "version": "0.3.1",
   "author": "Cojocaru David",
   "devDependencies": {
-    "bun-types": "latest",
+    "bun-types": "^1.2.20",
     "concurrently": "^9.1.2"
   },
   "peerDependencies": {

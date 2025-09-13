@@ -61,6 +61,127 @@ export default function Cta({
           </div>
         </div>
       </div>
+
+      <div className="mx-auto mt-12 max-w-6xl px-4 sm:px-6">
+        <div className="flex flex-wrap justify-center gap-4 items-center">
+          <a
+            href="https://launchigniter.com/product/snippets-library?ref=badge-snippets-library"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="badge-wrapper"
+            aria-label="Featured on LaunchIgniter"
+          >
+            <img
+              src="https://launchigniter.com/api/badge/snippets-library?theme=neutral"
+              alt="Featured on LaunchIgniter"
+              className="h-14 w-auto object-contain"
+            />
+          </a>
+
+          <a
+            href="https://fazier.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="badge-wrapper"
+            aria-label="Fazier badge"
+          >
+            <img
+              src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=neutral"
+              alt="Fazier badge"
+              className="h-14 w-auto object-contain"
+            />
+          </a>
+
+          <a
+            href="https://www.uneed.best/tool/snippets-library"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="badge-wrapper"
+            aria-label="Uneed badge"
+          >
+            <img
+              src="https://www.uneed.best/EMBED3B.png"
+              alt="Uneed Embed Badge"
+              className="h-14 w-auto object-contain"
+            />
+          </a>
+
+          <a
+            href="https://startupfa.st/projects/snippets-library-store-organize-amp-share-code-snippets"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Featured on Startup Fast"
+            className="badge-wrapper"
+            aria-label="Featured on Startup Fast"
+          >
+            <img
+              src="https://startupfa.st/badge-light.png"
+              alt="Featured on Startup Fast"
+              className="h-14 w-auto object-contain"
+            />
+          </a>
+
+          <a
+            href="https://www.rilna.net"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Find us on Rilna"
+            className="badge-wrapper"
+            aria-label="Featured on Rilna"
+          >
+            <span
+              className="inline-flex items-center gap-2 px-3 py-2 bg-white text-foreground border border-gray-200 rounded-md h-14"
+              style={{ fontFamily: "Inter, sans-serif" }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="none"
+                stroke="#7B3FF2"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                viewBox="0 0 24 24"
+                aria-hidden
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+              <span className="flex flex-col leading-none">
+                <span className="text-[11px] font-medium uppercase tracking-wide">
+                  FEATURED ON
+                </span>
+                <span className="text-[15px] font-bold">RILNA</span>
+              </span>
+            </span>
+          </a>
+
+          <a
+            href="https://www.microsaasexamples.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="badge-wrapper text-sm text-foreground px-3 h-14 inline-flex items-center justify-center border border-transparent"
+            aria-label="Featured on Micro SaaS Examples"
+          >
+            Featured On Micro SaaS Examples
+          </a>
+
+          <a
+            href="https://tinylaunch.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="badge-wrapper"
+            aria-label="TinyLaunch badge"
+          >
+            <img
+              src="https://tinylaunch.com/tinylaunch_badge_launching_soon.svg"
+              alt="TinyLaunch Badge"
+              className="h-14 w-auto object-contain"
+            />
+          </a>
+        </div>
+      </div>
     </section>
   );
 }

@@ -1,4 +1,6 @@
 import { MetadataRoute } from "next";
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 import { db } from "@/db";
 import { snippets } from "@/db/schema";
 import { eq, isNotNull, desc, and } from "drizzle-orm";
@@ -10,25 +12,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
-      lastModified: new Date().toISOString().split("T")[0],
+      lastModified: new Date(),
       changeFrequency: "daily",
       priority: 1.0,
     },
     {
       url: `${baseUrl}/explore`,
-      lastModified: new Date().toISOString().split("T")[0],
+      lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
       url: `${baseUrl}/terms`,
-      lastModified: "2025-07-31",
+      lastModified: new Date("2025-07-31"),
       changeFrequency: "yearly",
       priority: 0.5,
     },
     {
       url: `${baseUrl}/policies`,
-      lastModified: "2025-07-31",
+      lastModified: new Date("2025-07-31"),
       changeFrequency: "yearly",
       priority: 0.5,
     },
@@ -78,7 +80,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
         return {
           url: `${baseUrl}/share/${snippet.shareId}`,
-          lastModified: new Date(snippet.updatedAt).toISOString().split("T")[0],
+          lastModified: new Date(snippet.updatedAt),
           changeFrequency,
           priority: Math.round(priority * 100) / 100,
         };

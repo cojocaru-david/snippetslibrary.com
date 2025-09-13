@@ -73,7 +73,7 @@ export default function HeroHome({
                     onClick={() =>
                       window.open(
                         "https://github.com/cojocaru-david/snippetslibrary.com",
-                        "_blank"
+                        "_blank",
                       )
                     }
                     variant="outline"

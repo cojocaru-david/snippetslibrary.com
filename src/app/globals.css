@@ -170,6 +170,7 @@
     text-rendering: optimizeLegibility;
 
     -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
   }
 
   body {
@@ -179,6 +180,7 @@
 
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    overflow-x: hidden;
   }
 
   img,

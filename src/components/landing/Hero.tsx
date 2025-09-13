@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { GithubIcon } from "lucide-react";
+import Image from "next/image";
 
 export default function HeroHome({
   handleLogin,
@@ -72,7 +73,7 @@ export default function HeroHome({
                     onClick={() =>
                       window.open(
                         "https://github.com/cojocaru-david/snippetslibrary.com",
-                        "_blank",
+                        "_blank"
                       )
                     }
                     variant="outline"
@@ -92,20 +93,31 @@ export default function HeroHome({
                 href="https://openhunts.com/projects/snippets-library"
                 target="_blank"
                 title="OpenHunts Top 1 Daily Winner"
+                rel="noopener noreferrer"
               >
-                <img
-                  src="https://openhunts.com/images/badges/top1-light.png"
-                  alt="OpenHunts Top 1 Daily Winner"
-                  style={{ width: "195px", height: "auto" }}
-                  className="block dark:hidden"
-                />
+                <span className="block dark:hidden">
+                  <Image
+                    src="https://openhunts.com/images/badges/top1-light.png"
+                    alt="OpenHunts Top 1 Daily Winner"
+                    width={195}
+                    height={39}
+                    priority
+                    fetchPriority="high"
+                    style={{ height: "auto" }}
+                  />
+                </span>
 
-                <img
-                  src="https://openhunts.com/images/badges/top1-dark.png"
-                  alt="OpenHunts Top 1 Daily Winner"
-                  style={{ width: "195px", height: "auto" }}
-                  className="hidden dark:block"
-                />
+                <span className="hidden dark:block">
+                  <Image
+                    src="https://openhunts.com/images/badges/top1-dark.png"
+                    alt="OpenHunts Top 1 Daily Winner"
+                    width={195}
+                    height={39}
+                    priority
+                    fetchPriority="high"
+                    style={{ height: "auto" }}
+                  />
+                </span>
               </a>
             </div>
           </div>

@@ -4,30 +4,32 @@ import Image from "next/image";
 export default function PageIllustration() {
   return (
     <>
+      {/* Centered decorative stripes - constrained to viewport to avoid overflow */}
       <div
-        className="pointer-events-none absolute left-1/2 top-0 -z-10 -translate-x-1/2 transform"
+        className="pointer-events-none absolute left-1/2 top-0 -z-10 -translate-x-1/2 transform w-[90vw] max-w-[900px]"
         aria-hidden="true"
       >
         <Image
           className="max-w-none select-none mix-blend-luminosity opacity-1"
-          width={768}
-          height={768}
+          width={900}
+          height={900}
           src={Stripes}
           alt="Decorative stripes pattern"
           priority
           style={{
-            width: "768px",
+            width: "100%",
             height: "auto",
           }}
         />
       </div>
 
+      {/* Use percentages for off-center glows so they scale on small screens */}
       <div
-        className="pointer-events-none absolute -top-32 left-1/2 ml-[580px] -translate-x-1/2"
+        className="pointer-events-none absolute -top-32 left-[70%] -translate-x-1/2"
         aria-hidden="true"
       >
         <div
-          className="h-80 w-80 rounded-full opacity-50 blur-[160px]"
+          className="h-72 w-72 sm:h-80 sm:w-80 rounded-full opacity-50 blur-[160px]"
           style={{
             background:
               "radial-gradient(circle at 60% 40%, var(--color-primary), transparent 70%)",
@@ -35,11 +37,11 @@ export default function PageIllustration() {
         />
       </div>
       <div
-        className="pointer-events-none absolute left-1/2 top-[420px] ml-[380px] -translate-x-1/2"
+        className="pointer-events-none absolute left-[82%] top-[420px] -translate-x-1/2"
         aria-hidden="true"
       >
         <div
-          className="h-80 w-80 rounded-full opacity-50 blur-[160px]"
+          className="h-72 w-72 sm:h-80 sm:w-80 rounded-full opacity-50 blur-[160px]"
           style={{
             background:
               "radial-gradient(circle at 60% 40%, var(--color-primary), var(--color-background) 80%)",
@@ -47,11 +49,11 @@ export default function PageIllustration() {
         />
       </div>
       <div
-        className="pointer-events-none absolute left-1/2 top-[640px] -ml-[300px] -translate-x-1/2"
+        className="pointer-events-none absolute left-[18%] top-[640px] -translate-x-1/2"
         aria-hidden="true"
       >
         <div
-          className="h-80 w-80 rounded-full opacity-50 blur-[160px]"
+          className="h-72 w-72 sm:h-80 sm:w-80 rounded-full opacity-50 blur-[160px]"
           style={{
             background:
               "radial-gradient(circle at 60% 40%, var(--color-primary), var(--color-background) 80%)",

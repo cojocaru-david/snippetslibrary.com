@@ -38,6 +38,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "snippetslibrary.com",
       },
+      {
+        protocol: "https",
+        hostname: "openhunts.com",
+      },
     ],
     formats: ["image/webp", "image/avif"],
     minimumCacheTTL: 60,

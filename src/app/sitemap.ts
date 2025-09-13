@@ -5,7 +5,7 @@ import { eq, isNotNull, desc, and } from "drizzle-orm";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
+    process.env.NEXT_PUBLIC_APP_URL || "https://www.snippetslibrary.com";
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {

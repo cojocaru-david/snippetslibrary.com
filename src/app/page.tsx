@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     siteName: "Snippets Library",
     images: [
       {
-        url: `${baseUrl}/api/og?title=Welcome%20to%20Snippets%20Library&description=Your%20Personal%20Code%20Collection`,
+        url: `${baseUrl}/thub.png`,
         width: 1200,
         height: 630,
         alt: "Snippets Library - Code Snippet Manager Landing Page",
@@ -46,9 +46,7 @@ export const metadata: Metadata = {
     title: "Snippets Library - Store, Organize & Share Code Snippets",
     description:
       "The ultimate code snippet manager for developers. Beautiful syntax highlighting, instant search, and seamless GitHub integration.",
-    images: [
-      `${baseUrl}/api/og?title=Welcome%20to%20Snippets%20Library&description=Your%20Personal%20Code%20Collection`,
-    ],
+    images: [`${baseUrl}/thub.png`],
   },
   alternates: {
     canonical: baseUrl,

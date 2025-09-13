@@ -197,7 +197,7 @@ export async function generateMetadata({
   ];
 
   const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
+    process.env.NEXT_PUBLIC_APP_URL || "https://www.snippetslibrary.com";
   const shareUrl = `${baseUrl}/share/${shareId}`;
 
   const userLayoutTheme = snippet.displayTheme || "light";
@@ -313,7 +313,7 @@ export default async function ShareSnippetPage({ params }: PageProps) {
   }
 
   const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
+    process.env.NEXT_PUBLIC_APP_URL || "https://www.snippetslibrary.com";
   const shareUrl = `${baseUrl}/share/${shareId}`;
 
   const snippetDescription =

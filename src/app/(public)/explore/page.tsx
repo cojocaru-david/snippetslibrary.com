@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import ExplorePageClient from "./ExplorePageClient";
 
 const baseUrl =
-  process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
+  process.env.NEXT_PUBLIC_APP_URL || "https://www.snippetslibrary.com";
 
 let metadata: Metadata | undefined;
 

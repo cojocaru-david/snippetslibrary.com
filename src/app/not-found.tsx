@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import Logo from "@/components/custom/logo";
 
 const baseUrl =
-  process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
+  process.env.NEXT_PUBLIC_APP_URL || "https://www.snippetslibrary.com";
 
 export const metadata: Metadata = {
   title: "Page Not Found (404) - Snippets Library",

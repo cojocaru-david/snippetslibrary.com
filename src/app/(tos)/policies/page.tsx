@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 
 const baseUrl =
-  process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
+  process.env.NEXT_PUBLIC_APP_URL || "https://www.snippetslibrary.com";
 
 export const metadata: Metadata = {
   title: "Privacy Policy - Snippets Library",

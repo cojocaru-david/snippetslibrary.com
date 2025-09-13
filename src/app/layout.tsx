@@ -20,7 +20,7 @@ const outfit = Outfit({
 });
 
 const baseUrl =
-  process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
+  process.env.NEXT_PUBLIC_APP_URL || "https://www.snippetslibrary.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),

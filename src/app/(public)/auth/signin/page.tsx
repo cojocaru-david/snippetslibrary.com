@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import SignInPageClient from "./SignInPageClient";
 
 const baseUrl =
-  process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
+  process.env.NEXT_PUBLIC_APP_URL || "https://www.snippetslibrary.com";
 
 export const metadata: Metadata = {
   title: "Sign In - Snippets Library",

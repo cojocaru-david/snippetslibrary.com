@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import LandingPageClient from "./LandingPageClient";
 
 const baseUrl =
-  process.env.NEXT_PUBLIC_APP_URL || "https://snippetslibrary.com";
+  process.env.NEXT_PUBLIC_APP_URL || "https://www.snippetslibrary.com";
 
 export const metadata: Metadata = {
   title: "Snippets Library - Store, Organize & Share Code Snippets",

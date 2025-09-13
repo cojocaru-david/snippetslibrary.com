@@ -23,7 +23,6 @@ const nextConfig: NextConfig = {
       "@radix-ui/react-select",
       "@radix-ui/react-popover",
       "@radix-ui/react-switch",
-      "@radix-ui/react-tabs",
       "@radix-ui/react-label",
       "@radix-ui/react-slot",
     ],

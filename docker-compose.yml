@@ -33,7 +33,9 @@ services:
       dockerfile: Dockerfile
       target: runner
       args:
-        - BUILDTIME_DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+        GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+        GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+        AUTH_SECRET: ${AUTH_SECRET}
     image: snippets-library:latest
     container_name: snippets-app
     restart: unless-stopped

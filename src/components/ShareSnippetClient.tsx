@@ -26,102 +26,11 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
 import type { ShareSnippetClientProps } from "@/types";
-import { NumberTicker } from "@/components/magicui/number-ticker";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-
-const ActionButton = ({
-  onClick,
-  disabled,
-  loading,
-  variant = "outline",
-  size = "sm",
-  icon,
-  children,
-  className,
-}: {
-  onClick: () => void;
-  disabled?: boolean;
-  loading?: boolean;
-  variant?: "default" | "outline" | "secondary" | "ghost";
-  size?: "default" | "sm" | "lg";
-  icon?: React.ReactNode;
-  children?: React.ReactNode;
-  className?: string;
-}) => (
-  <Button
-    onClick={onClick}
-    disabled={disabled || loading}
-    variant={variant}
-    size={size}
-    className={cn(
-      "h-9 px-4 gap-2 font-medium transition-all duration-200 hover:scale-105 active:scale-95",
-      loading && "animate-pulse",
-      className,
-    )}
-  >
-    {loading ? (
-      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-    ) : (
-      icon
-    )}
-    {children}
-  </Button>
-);
-
-const StatsCard = ({
-  icon,
-  label,
-  value,
-  delay = 0,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: number | string;
-  delay?: number;
-}) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay, duration: 0.4 }}
-    className="group"
-  >
-    <Card className="border-0 bg-card/50 backdrop-blur-sm hover:bg-card/70 transition-all duration-300 hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground font-medium">{label}</p>
-            <div className="text-2xl font-bold tabular-nums">
-              {typeof value === "number" ? (
-                <NumberTicker value={value} />
-              ) : (
-                value
-              )}
-            </div>
-          </div>
-          <div className="p-2 rounded-lg bg-muted/50 group-hover:scale-110 transition-transform duration-200">
-            {icon}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  </motion.div>
-);
-
-const TagBadge = ({ tag, delay = 0 }: { tag: string; delay?: number }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.8 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ delay, duration: 0.3 }}
-  >
-    <Badge
-      variant="secondary"
-      className="bg-muted/50 hover:bg-muted border-0 text-xs px-3 py-1 font-medium transition-colors duration-200 cursor-default"
-    >
-      {tag}
-    </Badge>
-  </motion.div>
-);
+import { ActionButton } from "@/components/share/ActionButton";
+import { StatsCard } from "@/components/share/StatsCard";
+import { TagBadge } from "@/components/share/TagBadge";
 
 export default function ShareSnippetClient({
   snippet,

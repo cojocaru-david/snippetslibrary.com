@@ -10,7 +10,6 @@ on:
       - "README.md"
       - "docker-compose.yml"
       - "Dockerfile"
-      - "run_db_test.js"
       - "drizzle.config.ts"
   workflow_dispatch:
     inputs:

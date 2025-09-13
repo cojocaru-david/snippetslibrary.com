@@ -25,17 +25,19 @@ RUN if [ -f package-lock.json ]; then npm ci; \
     else echo "Lockfile not found." && exit 1; \
     fi
 
+# Copy .env file
+COPY .env ./
+
 COPY . .
 
 # Environment variables for build time
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-# Build-time environment variables (these will be overridden at runtime)
-ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
-ENV AUTH_SECRET="build-time-secret-min-32-chars-long"
-ENV GITHUB_CLIENT_ID="build-client-id"
-ENV GITHUB_CLIENT_SECRET="build-client-secret"
+# Debug: Print environment variables
+RUN echo "GITHUB_CLIENT_ID=$GITHUB_CLIENT_ID" && \
+    echo "GITHUB_CLIENT_SECRET=$GITHUB_CLIENT_SECRET" && \
+    echo "AUTH_SECRET=$AUTH_SECRET"
 
 # Build the application
 RUN npm run build

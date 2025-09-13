@@ -1,4 +1,18 @@
-# Snippets Library
+# 🗃️ Snippets Library
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Bun](https://img.shields.io/badge/Bun-000000?style=flat&logo=bun&logoColor=white)](https://bun.sh/)
+
+<p align="center">
+  <img src=".github/images/1.png" alt="Snippets Library Preview 1" width="45%" />
+  <img src=".github/images/2.png" alt="Snippets Library Preview 2" width="45%" />
+</p>
+<p align="center">
+  <img src=".github/images/3.png" alt="Snippets Library Preview 3" width="45%" />
+  <img src=".github/images/4.png" alt="Snippets Library Preview 4" width="45%" />
+</p>
 
 Snippets Library is a full-stack code snippet manager built with Next.js, TypeScript and Drizzle ORM. It provides authenticated snippet storage, syntax highlighting, instant search, public sharing, bookmarking, likes and view tracking.
 
@@ -203,3 +217,8 @@ This project is released under the MIT license. See the `LICENSE` file for detai
 - Security helpers (share ID, IP hashing): `src/lib/security.ts`.
 
 If you want a specific section expanded (examples, full API docs, or deployment recipe for a cloud provider), tell me which target environment and I will add a tailored guide.
+
+## 📞 Support
+
+- Create an [issue](https://github.com/cojocaru-david/snippetslibrary.com/issues) for bug reports
+- Start a [discussion](https://github.com/cojocaru-david/snippetslibrary.com/discussions) for questions

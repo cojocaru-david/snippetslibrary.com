@@ -180,6 +180,20 @@ export default function Cta({
               className="h-14 w-auto object-contain"
             />
           </a>
+
+          <a
+            href="https://dayslaunch.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="badge-wrapper"
+            aria-label="Featured on Days Launch"
+          >
+            <img
+              src="https://dayslaunch.com/badages-awards.svg"
+              alt="Featured on Days Launch"
+              className="h-14 w-auto object-contain"
+            />
+          </a>
         </div>
       </div>
     </section>

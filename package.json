@@ -72,7 +72,7 @@
     "@eslint/eslintrc": "^3",
     "@next/bundle-analyzer": "^15.5.3",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^24.3.3",
+    "@types/node": "^24.5.2",
     "@types/pg": "^8.15.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",

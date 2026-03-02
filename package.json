@@ -79,7 +79,7 @@
     "drizzle-kit": "^0.31.4",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
-    "prettier": "^3.6.2",
+    "prettier": "^3.8.1",
     "esbuild": "^0.25.8",
     "shiki": "^3.12.2",
     "tailwindcss": "^4",

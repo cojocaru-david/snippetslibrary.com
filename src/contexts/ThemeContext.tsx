@@ -12,10 +12,6 @@ import type { UITheme, ThemeContextType } from "@/types";
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<UITheme>("system");
-  const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">("light");
-  const [isLoading, setIsLoading] = useState(true);
-
   const getInitialTheme = useCallback((): UITheme => {
     if (typeof window === "undefined") return "system";
 
@@ -42,6 +38,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return theme;
   }, []);
 
+  const [theme, setTheme] = useState<UITheme>(() => getInitialTheme());
+  const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">(() =>
+    resolveTheme(getInitialTheme()),
+  );
+
   const applyTheme = useCallback((resolvedTheme: "dark" | "light") => {
     const root = window.document.documentElement;
 
@@ -53,14 +54,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const initialTheme = getInitialTheme();
-    const resolved = resolveTheme(initialTheme);
-
-    setTheme(initialTheme);
-    setResolvedTheme(resolved);
-    applyTheme(resolved);
-    setIsLoading(false);
-  }, [getInitialTheme, resolveTheme, applyTheme]);
+    applyTheme(resolvedTheme);
+  }, [applyTheme, resolvedTheme]);
 
   const handleSetTheme = useCallback(
     (newTheme: UITheme) => {
@@ -98,7 +93,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     theme,
     setTheme: handleSetTheme,
     resolvedTheme,
-    isLoading,
+    isLoading: false,
   };
 
   return (

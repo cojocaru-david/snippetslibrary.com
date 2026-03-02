@@ -140,163 +140,203 @@ export async function GET(request: NextRequest) {
     const cacheKey = `og-${title}-${description}-${language}-${selectedTheme}-${authorName}`;
 
     const response = new ImageResponse(
-      (
+      <div
+        style={{
+          background: theme.background,
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
         <div
           style={{
-            background: theme.background,
+            position: "absolute",
+            top: "-50%",
+            right: "-20%",
+            width: "600px",
+            height: "600px",
+            background: `radial-gradient(circle, ${theme.glowColor} 0%, transparent 70%)`,
+            borderRadius: "50%",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: "-30%",
+            left: "-15%",
+            width: "400px",
+            height: "400px",
+            background: `radial-gradient(circle, ${theme.glowColor} 0%, transparent 60%)`,
+            borderRadius: "50%",
+          }}
+        />
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
             width: "100%",
             height: "100%",
-            display: "flex",
+            padding: "80px",
             position: "relative",
-            overflow: "hidden",
+            zIndex: 1,
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           <div
             style={{
-              position: "absolute",
-              top: "-50%",
-              right: "-20%",
-              width: "600px",
-              height: "600px",
-              background: `radial-gradient(circle, ${theme.glowColor} 0%, transparent 70%)`,
-              borderRadius: "50%",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              bottom: "-30%",
-              left: "-15%",
-              width: "400px",
-              height: "400px",
-              background: `radial-gradient(circle, ${theme.glowColor} 0%, transparent 60%)`,
-              borderRadius: "50%",
-            }}
-          />
-
-          <div
-            style={{
               display: "flex",
-              flexDirection: "column",
-              width: "100%",
-              height: "100%",
-              padding: "80px",
-              position: "relative",
-              zIndex: 1,
-              justifyContent: "center",
               alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "60px",
+              width: "100%",
             }}
           >
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "60px",
-                width: "100%",
+                gap: "16px",
               }}
             >
               <div
                 style={{
+                  width: "48px",
+                  height: "48px",
+                  background: `linear-gradient(135deg, ${theme.accent} 0%, ${languageColor.primary} 100%)`,
+                  borderRadius: "16px",
                   display: "flex",
                   alignItems: "center",
-                  gap: "16px",
+                  justifyContent: "center",
+                  position: "relative",
+                  boxShadow: `0 8px 24px ${theme.accent}40`,
                 }}
               >
                 <div
                   style={{
-                    width: "48px",
-                    height: "48px",
-                    background: `linear-gradient(135deg, ${theme.accent} 0%, ${languageColor.primary} 100%)`,
-                    borderRadius: "16px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    width: "24px",
+                    height: "24px",
+                    background: "#ffffff",
+                    borderRadius: "6px",
                     position: "relative",
-                    boxShadow: `0 8px 24px ${theme.accent}40`,
+                    transform: "rotate(45deg)",
                   }}
-                >
-                  <div
-                    style={{
-                      width: "24px",
-                      height: "24px",
-                      background: "#ffffff",
-                      borderRadius: "6px",
-                      position: "relative",
-                      transform: "rotate(45deg)",
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      width: "16px",
-                      height: "16px",
-                      background: theme.accent,
-                      borderRadius: "4px",
-                      transform: "rotate(45deg)",
-                    }}
-                  />
-                </div>
-
+                />
                 <div
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "2px",
+                    position: "absolute",
+                    width: "16px",
+                    height: "16px",
+                    background: theme.accent,
+                    borderRadius: "4px",
+                    transform: "rotate(45deg)",
                   }}
-                >
-                  <span
-                    style={{
-                      fontSize: "26px",
-                      fontWeight: "800",
-                      color: theme.primaryText,
-                      fontFamily: "ui-sans-serif, system-ui, sans-serif",
-                      letterSpacing: "-0.025em",
-                      lineHeight: "1",
-                    }}
-                  >
-                    Snippets Library
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "12px",
-                      color: theme.mutedText,
-                      fontFamily: "ui-sans-serif, system-ui, sans-serif",
-                      letterSpacing: "0.05em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    Code Collection Platform
-                  </span>
-                </div>
+                />
               </div>
 
               <div
                 style={{
                   display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  background: `linear-gradient(135deg, ${languageColor.primary} 0%, ${languageColor.secondary} 100%)`,
-                  padding: "12px 20px",
-                  borderRadius: "25px",
-                  color: "#ffffff",
-                  fontSize: "16px",
-                  fontWeight: "600",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  boxShadow: `0 4px 12px ${languageColor.primary}40`,
+                  flexDirection: "column",
+                  gap: "2px",
                 }}
               >
-                <div
+                <span
                   style={{
-                    width: "10px",
-                    height: "10px",
+                    fontSize: "26px",
+                    fontWeight: "800",
+                    color: theme.primaryText,
+                    fontFamily: "ui-sans-serif, system-ui, sans-serif",
+                    letterSpacing: "-0.025em",
+                    lineHeight: "1",
+                  }}
+                >
+                  Snippets Library
+                </span>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    color: theme.mutedText,
+                    fontFamily: "ui-sans-serif, system-ui, sans-serif",
+                    letterSpacing: "0.05em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Code Collection Platform
+                </span>
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                background: `linear-gradient(135deg, ${languageColor.primary} 0%, ${languageColor.secondary} 100%)`,
+                padding: "12px 20px",
+                borderRadius: "25px",
+                color: "#ffffff",
+                fontSize: "16px",
+                fontWeight: "600",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+                boxShadow: `0 4px 12px ${languageColor.primary}40`,
+              }}
+            >
+              <div
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "50%",
+                  backgroundColor: "#ffffff",
+                }}
+              />
+              {language}
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              background: theme.cardBackground,
+              borderRadius: "32px",
+              border: `1px solid ${theme.border}`,
+              boxShadow: `0 25px 50px -12px ${theme.shadowColor}`,
+              backdropFilter: "blur(20px)",
+              padding: "80px 60px",
+              width: "100%",
+              maxWidth: "900px",
+              position: "relative",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: "24px",
+                left: "24px",
+                display: "flex",
+                gap: "10px",
+              }}
+            >
+              {theme.windowControls.map((color, index) => (
+                <div
+                  key={index}
+                  style={{
+                    width: "14px",
+                    height: "14px",
                     borderRadius: "50%",
-                    backgroundColor: "#ffffff",
+                    backgroundColor: color,
+                    boxShadow: `0 2px 4px ${color}40`,
                   }}
                 />
-                {language}
-              </div>
+              ))}
             </div>
 
             <div
@@ -304,97 +344,74 @@ export async function GET(request: NextRequest) {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "center",
-                background: theme.cardBackground,
-                borderRadius: "32px",
-                border: `1px solid ${theme.border}`,
-                boxShadow: `0 25px 50px -12px ${theme.shadowColor}`,
-                backdropFilter: "blur(20px)",
-                padding: "80px 60px",
+                gap: "32px",
                 width: "100%",
-                maxWidth: "900px",
-                position: "relative",
-                textAlign: "center",
               }}
             >
-              <div
+              <h1
                 style={{
-                  position: "absolute",
-                  top: "24px",
-                  left: "24px",
-                  display: "flex",
-                  gap: "10px",
+                  fontSize: "48px",
+                  fontWeight: "800",
+                  color: theme.primaryText,
+                  margin: 0,
+                  lineHeight: "1.1",
+                  fontFamily: "ui-sans-serif, system-ui, sans-serif",
+                  background: `linear-gradient(135deg, ${theme.primaryText} 0%, ${theme.accent} 100%)`,
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  letterSpacing: "-0.025em",
+                  wordWrap: "break-word",
+                  textWrap: "balance",
+                  textAlign: "center",
                 }}
               >
-                {theme.windowControls.map((color, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      width: "14px",
-                      height: "14px",
-                      borderRadius: "50%",
-                      backgroundColor: color,
-                      boxShadow: `0 2px 4px ${color}40`,
-                    }}
-                  />
-                ))}
-              </div>
+                {title}
+              </h1>
+
+              <p
+                style={{
+                  fontSize: "22px",
+                  color: theme.secondaryText,
+                  margin: 0,
+                  lineHeight: "1.5",
+                  fontFamily: "ui-sans-serif, system-ui, sans-serif",
+                  wordWrap: "break-word",
+                  textWrap: "pretty",
+                  textAlign: "center",
+                  maxWidth: "700px",
+                }}
+              >
+                {description}
+              </p>
 
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
                   gap: "32px",
-                  width: "100%",
+                  marginTop: "24px",
+                  flexWrap: "wrap",
+                  justifyContent: "center",
                 }}
               >
-                <h1
-                  style={{
-                    fontSize: "48px",
-                    fontWeight: "800",
-                    color: theme.primaryText,
-                    margin: 0,
-                    lineHeight: "1.1",
-                    fontFamily: "ui-sans-serif, system-ui, sans-serif",
-                    background: `linear-gradient(135deg, ${theme.primaryText} 0%, ${theme.accent} 100%)`,
-                    backgroundClip: "text",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    letterSpacing: "-0.025em",
-                    wordWrap: "break-word",
-                    textWrap: "balance",
-                    textAlign: "center",
-                  }}
-                >
-                  {title}
-                </h1>
-
-                <p
-                  style={{
-                    fontSize: "22px",
-                    color: theme.secondaryText,
-                    margin: 0,
-                    lineHeight: "1.5",
-                    fontFamily: "ui-sans-serif, system-ui, sans-serif",
-                    wordWrap: "break-word",
-                    textWrap: "pretty",
-                    textAlign: "center",
-                    maxWidth: "700px",
-                  }}
-                >
-                  {description}
-                </p>
-
                 <div
                   style={{
                     display: "flex",
-                    gap: "32px",
-                    marginTop: "24px",
-                    flexWrap: "wrap",
-                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "8px",
+                    color: theme.mutedText,
+                    fontSize: "16px",
+                    fontFamily: "ui-sans-serif, system-ui, sans-serif",
+                    background: theme.headerBackground,
+                    padding: "8px 16px",
+                    borderRadius: "12px",
+                    border: `1px solid ${theme.border}`,
                   }}
                 >
+                  <span>💻</span>
+                  Code Snippet
+                </div>
+                {authorName && (
                   <div
                     style={{
                       display: "flex",
@@ -409,44 +426,25 @@ export async function GET(request: NextRequest) {
                       border: `1px solid ${theme.border}`,
                     }}
                   >
-                    <span>💻</span>
-                    Code Snippet
+                    <span>👤</span>
+                    {authorName}
                   </div>
-                  {authorName && (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        color: theme.mutedText,
-                        fontSize: "16px",
-                        fontFamily: "ui-sans-serif, system-ui, sans-serif",
-                        background: theme.headerBackground,
-                        padding: "8px 16px",
-                        borderRadius: "12px",
-                        border: `1px solid ${theme.border}`,
-                      }}
-                    >
-                      <span>👤</span>
-                      {authorName}
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
             </div>
-
-            <div
-              style={{
-                height: "4px",
-                background: `linear-gradient(90deg, ${languageColor.primary} 0%, ${theme.accent} 50%, ${languageColor.secondary} 100%)`,
-                borderRadius: "2px",
-                marginTop: "40px",
-                width: "200px",
-              }}
-            />
           </div>
+
+          <div
+            style={{
+              height: "4px",
+              background: `linear-gradient(90deg, ${languageColor.primary} 0%, ${theme.accent} 50%, ${languageColor.secondary} 100%)`,
+              borderRadius: "2px",
+              marginTop: "40px",
+              width: "200px",
+            }}
+          />
         </div>
-      ),
+      </div>,
       {
         width: 1200,
         height: 630,

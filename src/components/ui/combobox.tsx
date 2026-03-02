@@ -66,6 +66,7 @@ export function Combobox({
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
+  const [triggerWidth, setTriggerWidth] = React.useState<number>();
 
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
@@ -139,6 +140,28 @@ export function Combobox({
     if (!open) {
       setSearchValue("");
     }
+  }, [open]);
+
+  React.useEffect(() => {
+    if (!open) return;
+
+    const updateWidth = () => {
+      setTriggerWidth(triggerRef.current?.offsetWidth);
+    };
+
+    updateWidth();
+
+    const triggerElement = triggerRef.current;
+    if (!triggerElement) return;
+
+    const resizeObserver = new ResizeObserver(updateWidth);
+    resizeObserver.observe(triggerElement);
+    window.addEventListener("resize", updateWidth);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateWidth);
+    };
   }, [open]);
 
   const handleKeyDown = React.useCallback((e: React.KeyboardEvent) => {
@@ -219,7 +242,7 @@ export function Combobox({
           align="start"
           onKeyDown={handleKeyDown}
           style={{
-            width: triggerRef.current?.offsetWidth || "auto",
+            width: triggerWidth ? `${triggerWidth}px` : "auto",
           }}
         >
           <Command shouldFilter={false}>

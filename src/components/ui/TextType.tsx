@@ -25,7 +25,6 @@ interface TextTypeProps {
   pauseDuration?: number;
   deletingSpeed?: number;
   loop?: boolean;
-  textColors?: string[];
   variableSpeed?: { min: number; max: number };
   onSentenceComplete?: (sentence: string, index: number) => void;
   startOnVisible?: boolean;
@@ -33,8 +32,8 @@ interface TextTypeProps {
 }
 
 const TextType = ({
+  as,
   text,
-  as: Component = "div",
   typingSpeed = 50,
   initialDelay = 0,
   pauseDuration = 2000,
@@ -50,8 +49,9 @@ const TextType = ({
   onSentenceComplete,
   startOnVisible = false,
   reverseMode = false,
-  ...props
+  ...rest
 }: TextTypeProps & React.HTMLAttributes<HTMLElement>) => {
+  const Component = as || "div";
   const [displayedText, setDisplayedText] = useState("");
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -180,22 +180,41 @@ const TextType = ({
     hideCursorWhileTyping &&
     (currentCharIndex < textArray[currentTextIndex].length || isDeleting);
 
-  return createElement(
-    Component,
-    {
-      ref: containerRef,
-      className: `inline-block whitespace-pre-wrap tracking-tight ${className}`,
-      ...props,
-    },
-    <span className="inline">{displayedText}</span>,
-    showCursor && (
-      <span
-        ref={cursorRef}
-        className={`ml-1 inline-block opacity-100 ${shouldHideCursor ? "hidden" : ""} ${cursorClassName}`}
+  const content = (
+    <>
+      <span className="inline">{displayedText}</span>
+      {showCursor && (
+        <span
+          ref={cursorRef}
+          className={`ml-1 inline-block opacity-100 ${shouldHideCursor ? "hidden" : ""} ${cursorClassName}`}
+        >
+          {cursorCharacter}
+        </span>
+      )}
+    </>
+  );
+
+  const componentProps = {
+    className: `inline-block whitespace-pre-wrap tracking-tight ${className}`,
+    ...rest,
+  };
+
+  if (typeof Component === "string") {
+    const IntrinsicComponent = Component as React.ElementType;
+    return (
+      <IntrinsicComponent
+        {...componentProps}
+        ref={containerRef as React.Ref<HTMLElement>}
       >
-        {cursorCharacter}
-      </span>
-    ),
+        {content}
+      </IntrinsicComponent>
+    );
+  }
+
+  return (
+    <span ref={containerRef} className="inline-block whitespace-pre-wrap">
+      {createElement(Component, componentProps, content)}
+    </span>
   );
 };
 
